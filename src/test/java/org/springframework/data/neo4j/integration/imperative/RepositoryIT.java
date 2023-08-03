@@ -234,13 +234,15 @@ class RepositoryIT {
 			transaction.run("CREATE (n:PersonWithNoConstructor) SET n.name = $name, n.first_name = $firstName",
 					Values.parameters("name", TEST_PERSON1_NAME, "firstName", TEST_PERSON1_FIRST_NAME));
 			transaction.run("CREATE (n:PersonWithWither) SET n.name = '" + TEST_PERSON1_NAME + "'");
-			transaction.run("CREATE (n:KotlinPerson), "
-							+ " (n)-[:WORKS_IN{since: 2019}]->(:KotlinClub{name: 'Golf club'}) SET n.name = '" + TEST_PERSON1_NAME + "'");
+			transaction.run("""
+							CREATE (n:KotlinPerson), \
+							 (n)-[:WORKS_IN{since: 2019}]->(:KotlinClub{name: 'Golf club'}) SET n.name = '\
+							""" + TEST_PERSON1_NAME + "'");
 			transaction.run("CREATE (a:Thing {theId: 'anId', name: 'Homer'})-[:Has]->(b:Thing2{theId: 4711, name: 'Bart'})");
 
 			IntStream.rangeClosed(1, 20)
 					.forEach(i -> transaction.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})",
-							Values.parameters("i", String.format("%02d", i))));
+							Values.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, createdAt.toInstant());
@@ -1431,14 +1433,16 @@ class RepositoryIT {
 		void shouldBeStorableOnSets(
 				@Autowired Neo4jTemplate template) {
 
-			var hlp = doWithSession(session -> session.run("CREATE (n:PersonWithRelationshipWithProperties2{name:'Freddie'}),"
-										+ " (n)-[l1:LIKES "
-										+ "{since: 1995, active: true, localDate: date('1995-02-26'), myEnum: 'SOMETHING', point: point({x: 0, y: 1})}"
-										+ "]->(h1:Hobby{name:'Music'}), "
-										+ "(n)-[l2:LIKES "
-										+ "{since: 2000, active: false, localDate: date('2000-06-28'), myEnum: 'SOMETHING_DIFFERENT', point: point({x: 2, y: 3})}"
-										+ "]->(h2:Hobby{name:'Something else'})"
-										+ "RETURN n, h1, h2").single().get("n").asNode());
+			var hlp = doWithSession(session -> session.run("""
+										CREATE (n:PersonWithRelationshipWithProperties2{name:'Freddie'}),\
+										 (n)-[l1:LIKES \
+										{since: 1995, active: true, localDate: date('1995-02-26'), myEnum: 'SOMETHING', point: point({x: 0, y: 1})}\
+										]->(h1:Hobby{name:'Music'}), \
+										(n)-[l2:LIKES \
+										{since: 2000, active: false, localDate: date('2000-06-28'), myEnum: 'SOMETHING_DIFFERENT', point: point({x: 2, y: 3})}\
+										]->(h2:Hobby{name:'Something else'})\
+										RETURN n, h1, h2\
+										""").single().get("n").asNode());
 			long personId = TestIdentitySupport.getInternalId(hlp);
 			Optional<PersonWithRelationshipWithProperties2> optionalPerson = template.findById(personId, PersonWithRelationshipWithProperties2.class);
 			assertThat(optionalPerson).hasValueSatisfying(person -> {
@@ -1451,17 +1455,19 @@ class RepositoryIT {
 		void findEntityWithRelationshipWithProperties(
 				@Autowired PersonWithRelationshipWithPropertiesRepository repository) {
 
-			Record record = doWithSession(session -> session.run("CREATE (n:PersonWithRelationshipWithProperties{name:'Freddie'}),"
-										+ " (n)-[l1:LIKES "
-										+ "{since: 1995, active: true, localDate: date('1995-02-26'), myEnum: 'SOMETHING', point: point({x: 0, y: 1})}"
-										+ "]->(h1:Hobby{name:'Music'}), "
-										+ "(n)-[l2:LIKES "
-										+ "{since: 2000, active: false, localDate: date('2000-06-28'), myEnum: 'SOMETHING_DIFFERENT', point: point({x: 2, y: 3})}"
-										+ "]->(h2:Hobby{name:'Something else'}), "
-										+ "(n) - [:OWNS] -> (p:Pet {name: 'A Pet'}), "
-										+ "(n) - [:OWNS {place: 'The place to be'}] -> (c1:Club {name: 'Berlin Mitte'}), "
-										+ "(n) - [:OWNS {place: 'Whatever'}] -> (c2:Club {name: 'Schachklub'}) "
-										+ "RETURN n, h1, h2").single());
+			Record record = doWithSession(session -> session.run("""
+										CREATE (n:PersonWithRelationshipWithProperties{name:'Freddie'}),\
+										 (n)-[l1:LIKES \
+										{since: 1995, active: true, localDate: date('1995-02-26'), myEnum: 'SOMETHING', point: point({x: 0, y: 1})}\
+										]->(h1:Hobby{name:'Music'}), \
+										(n)-[l2:LIKES \
+										{since: 2000, active: false, localDate: date('2000-06-28'), myEnum: 'SOMETHING_DIFFERENT', point: point({x: 2, y: 3})}\
+										]->(h2:Hobby{name:'Something else'}), \
+										(n) - [:OWNS] -> (p:Pet {name: 'A Pet'}), \
+										(n) - [:OWNS {place: 'The place to be'}] -> (c1:Club {name: 'Berlin Mitte'}), \
+										(n) - [:OWNS {place: 'Whatever'}] -> (c2:Club {name: 'Schachklub'}) \
+										RETURN n, h1, h2\
+										""").single());
 
 			Node personNode = record.get("n").asNode();
 			Node hobbyNode1 = record.get("h1").asNode();
@@ -1508,11 +1514,13 @@ class RepositoryIT {
 		@Test
 		void findEntityWithRelationshipWithPropertiesScalar(@Autowired PersonWithRelationshipWithPropertiesRepository repository) {
 
-			long personId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("CREATE (n:PersonWithRelationshipWithProperties{name:'Freddie'}),"
-											+ " (n)-[:WORKS_IN{since: 1995}]->(:Club{name:'Blubb'}),"
-											+ "(n) - [:OWNS {place: 'The place to be'}] -> (c1:Club {name: 'Berlin Mitte'}), "
-											+ "(n) - [:OWNS {place: 'Whatever'}] -> (c2:Club {name: 'Schachklub'}) "
-											+ "RETURN n").single().get("n").asNode()));
+			long personId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("""
+											CREATE (n:PersonWithRelationshipWithProperties{name:'Freddie'}),\
+											 (n)-[:WORKS_IN{since: 1995}]->(:Club{name:'Blubb'}),\
+											(n) - [:OWNS {place: 'The place to be'}] -> (c1:Club {name: 'Berlin Mitte'}), \
+											(n) - [:OWNS {place: 'Whatever'}] -> (c2:Club {name: 'Schachklub'}) \
+											RETURN n\
+											""").single().get("n").asNode()));
 
 			PersonWithRelationshipWithProperties person = repository.findById(personId).get();
 
@@ -1525,9 +1533,11 @@ class RepositoryIT {
 		void findEntityWithRelationshipWithPropertiesSameLabel(
 				@Autowired FriendRepository repository) {
 
-			long friendId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("CREATE (n:Friend{name:'Freddie'}),"
-											+ " (n)-[:KNOWS{since: 1995}]->(:Friend{name:'Frank'})"
-											+ "RETURN n").single().get("n").asNode()));
+			long friendId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("""
+											CREATE (n:Friend{name:'Freddie'}),\
+											 (n)-[:KNOWS{since: 1995}]->(:Friend{name:'Frank'})\
+											RETURN n\
+											""").single().get("n").asNode()));
 
 			Friend person = repository.findById(friendId).get();
 
@@ -1687,10 +1697,12 @@ class RepositoryIT {
 		@Test
 		void loadSameNodeWithDoubleRelationship(@Autowired HobbyWithRelationshipWithPropertiesRepository repository) {
 
-			long personId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("CREATE (n:AltPerson{name:'Freddie'})," +
-											" (n)-[l1:LIKES {rating: 5}]->(h1:AltHobby{name:'Music'})," +
-											" (n)-[l2:LIKES {rating: 1}]->(h1)" +
-											" RETURN n, h1").single().get("n").asNode()));
+			long personId = TestIdentitySupport.getInternalId(doWithSession(session -> session.run("""
+											CREATE (n:AltPerson{name:'Freddie'}),\
+											 (n)-[l1:LIKES {rating: 5}]->(h1:AltHobby{name:'Music'}),\
+											 (n)-[l2:LIKES {rating: 1}]->(h1)\
+											 RETURN n, h1\
+											""").single().get("n").asNode()));
 
 			AltHobby hobby = repository.loadFromCustomQuery(personId);
 			assertThat(hobby.getName()).isEqualTo("Music");
@@ -1722,9 +1734,11 @@ class RepositoryIT {
 		void findAndMapMultipleLevelRelationshipProperties(
 				@Autowired EntityWithRelationshipPropertiesPathRepository repository) {
 
-			long eId = doWithSession(session -> session.run("CREATE (n:EntityWithRelationshipPropertiesPath)-[:RelationshipA]->(:EntityA)" +
-								  "-[:RelationshipB]->(:EntityB)" +
-								  " RETURN id(n) as eId").single().get("eId").asLong());
+			long eId = doWithSession(session -> session.run("""
+								  CREATE (n:EntityWithRelationshipPropertiesPath)-[:RelationshipA]->(:EntityA)\
+								  -[:RelationshipB]->(:EntityB)\
+								   RETURN id(n) as eId\
+								  """).single().get("eId").asLong());
 
 			EntityWithRelationshipPropertiesPath entity = repository.findById(eId).get();
 			assertThat(entity).isNotNull();
@@ -1774,7 +1788,7 @@ class RepositoryIT {
 			transaction.run("CREATE (a:Thing {theId: 'anId', name: 'Homer'})-[:Has]->(b:Thing2{theId: 4711, name: 'Bart'})");
 			IntStream.rangeClosed(1, 20)
 					.forEach(i -> transaction.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})",
-							Values.parameters("i", String.format("%02d", i))));
+							Values.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, createdAt.toInstant());
@@ -1813,8 +1827,10 @@ class RepositoryIT {
 			// ensure that no relationship got deleted upfront
 			assertWithSession(session -> {
 				Long relCount = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]-(:SimplePerson) return count(r) as rCount")
+						tx.run("""
+							   MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]-(:SimplePerson) return count(r) as rCount\
+							   """)
 								.next().get("rCount").asLong());
 
 				assertThat(relCount).isEqualTo(2);
@@ -1826,8 +1842,10 @@ class RepositoryIT {
 				@Autowired ThingWithFixedGeneratedIdRepository repository) {
 
 			Long rId = doWithSession(session -> session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]->(:SimplePerson) return id(r) as rId")
+						tx.run("""
+							   CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+							   """)
 								.next().get("rId").asLong()));
 
 			ThingWithFixedGeneratedId loadedThing = repository.findById("ThingWithFixedGeneratedId").get();
@@ -1835,8 +1853,10 @@ class RepositoryIT {
 
 			assertWithSession(session -> {
 				Long newRid = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]-(:SimplePerson) return id(r) as rId")
+						tx.run("""
+							   MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]-(:SimplePerson) return id(r) as rId\
+							   """)
 								.next().get("rId").asLong());
 
 				assertThat(rId).isNotEqualTo(newRid);
@@ -1849,8 +1869,10 @@ class RepositoryIT {
 
 			doWithSession(session ->
 					session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]->(:SimplePerson) return id(r) as rId").consume()));
+						tx.run("""
+							   CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+							   """).consume()));
 
 			ThingWithFixedGeneratedId thing = new ThingWithFixedGeneratedId("name");
 			// this will create a duplicated relationship because we use the same ids
@@ -1860,8 +1882,10 @@ class RepositoryIT {
 			// ensure that no relationship got deleted upfront
 			assertWithSession(session -> {
 				Long relCount = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]-(:SimplePerson) return count(r) as rCount")
+						tx.run("""
+							   MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]-(:SimplePerson) return count(r) as rCount\
+							   """)
 								.next().get("rCount").asLong());
 
 				assertThat(relCount).isEqualTo(2);
@@ -1873,8 +1897,10 @@ class RepositoryIT {
 				@Autowired ThingWithFixedGeneratedIdRepository repository) {
 
 			Long rId = doWithSession(session -> session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]->(:SimplePerson) return id(r) as rId")
+						tx.run("""
+							   CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+							   """)
 								.next().get("rId").asLong()));
 
 			ThingWithFixedGeneratedId loadedThing = repository.findById("ThingWithFixedGeneratedId").get();
@@ -1882,8 +1908,10 @@ class RepositoryIT {
 
 			assertWithSession(session -> {
 				Long newRid = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-							   "-[r:KNOWS]-(:SimplePerson) return id(r) as rId")
+						tx.run("""
+							   MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+							   -[r:KNOWS]-(:SimplePerson) return id(r) as rId\
+							   """)
 								.next().get("rId").asLong());
 
 				assertThat(rId).isNotEqualTo(newRid);
@@ -2466,8 +2494,10 @@ class RepositoryIT {
 			repository.save(start);
 
 			assertWithSession(session -> {
-				List<Record> records = session.run("MATCH (end:BidirectionalEnd)<-[r:CONNECTED]-(start:BidirectionalStart)" +
-												   " RETURN start, r, end").list();
+				List<Record> records = session.run("""
+												   MATCH (end:BidirectionalEnd)<-[r:CONNECTED]-(start:BidirectionalStart)\
+												    RETURN start, r, end\
+												   """).list();
 
 				assertThat(records).hasSize(1);
 			});
@@ -2739,8 +2769,10 @@ class RepositoryIT {
 		@Test
 		void deleteCollectionRelationship(@Autowired RelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (n:PersonWithRelationship{name:'Freddie'}), "
-							+ "(n)-[:Has]->(p1:Pet{name: 'Jerry'}), (n)-[:Has]->(p2:Pet{name: 'Tom'})").consume());
+					session.run("""
+							CREATE (n:PersonWithRelationship{name:'Freddie'}), \
+							(n)-[:Has]->(p1:Pet{name: 'Jerry'}), (n)-[:Has]->(p2:Pet{name: 'Tom'})\
+							""").consume());
 
 			PersonWithRelationship person = repository.getPersonWithRelationshipsViaQuery();
 			person.getPets().remove(0);
@@ -3288,7 +3320,7 @@ class RepositoryIT {
 
 			IntStream.rangeClosed(1, 20)
 					.forEach(i -> transaction.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})",
-							Values.parameters("i", String.format("%02d", i))));
+							Values.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, createdAt.toInstant());
@@ -4076,8 +4108,10 @@ class RepositoryIT {
 			Inheritance.ConcreteClassA ccA = new Inheritance.ConcreteClassA(concreteClassName, someValue);
 			ccA.others = Collections.singletonList(new Inheritance.ConcreteClassB("ccB", 41));
 			neo4jTemplate.save(ccA);
-			List<Inheritance.SuperBaseClass> ccAs = neo4jTemplate.findAll("MATCH (a:SuperBaseClass{name: 'cc1'})-[r]->(m) " +
-																		  "RETURN a, collect(r), collect(m)",
+			List<Inheritance.SuperBaseClass> ccAs = neo4jTemplate.findAll("""
+																		  MATCH (a:SuperBaseClass{name: 'cc1'})-[r]->(m) \
+																		  RETURN a, collect(r), collect(m)\
+																		  """,
 					Inheritance.SuperBaseClass.class);
 			assertThat(ccAs).hasSize(1);
 			Inheritance.SuperBaseClass loadedCcA = ccAs.get(0);
@@ -4351,8 +4385,10 @@ class RepositoryIT {
 
 		@Test
 		void findByPropertyOnRelatedEntitiesOr(@Autowired RelationshipRepository repository) {
-			doWithSession(session -> session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),"
-							+ "(n)-[:Has]->(:Hobby{name: 'Music'})").consume());
+			doWithSession(session -> session.run("""
+							CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),\
+							(n)-[:Has]->(:Hobby{name: 'Music'})\
+							""").consume());
 
 			assertThat(repository.findByHobbiesNameOrPetsName("Music", "Jerry").getName()).isEqualTo("Freddie");
 			assertThat(repository.findByHobbiesNameOrPetsName("Sports", "Tom").getName()).isEqualTo("Freddie");
@@ -4362,8 +4398,10 @@ class RepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntitiesAnd(@Autowired RelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),"
-							+ "(n)-[:Has]->(:Hobby{name: 'Music'})").consume());
+					session.run("""
+							CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),\
+							(n)-[:Has]->(:Hobby{name: 'Music'})\
+							""").consume());
 
 			assertThat(repository.findByHobbiesNameAndPetsName("Music", "Tom").getName()).isEqualTo("Freddie");
 			assertThat(repository.findByHobbiesNameAndPetsName("Sports", "Jerry")).isNull();
@@ -4372,8 +4410,10 @@ class RepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntityOfRelatedEntity(@Autowired RelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})"
-							+ "-[:Has]->(:Hobby{name: 'Sleeping'})").consume());
+					session.run("""
+							CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})\
+							-[:Has]->(:Hobby{name: 'Sleeping'})\
+							""").consume());
 
 			assertThat(repository.findByPetsHobbiesName("Sleeping").getName()).isEqualTo("Freddie");
 			assertThat(repository.findByPetsHobbiesName("Sports")).isNull();
@@ -4382,8 +4422,10 @@ class RepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntityOfRelatedSameEntity(@Autowired RelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})"
-							+ "-[:Has]->(:Pet{name: 'Tom'})").consume());
+					session.run("""
+							CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})\
+							-[:Has]->(:Pet{name: 'Tom'})\
+							""").consume());
 
 			assertThat(repository.findByPetsFriendsName("Tom").getName()).isEqualTo("Freddie");
 			assertThat(repository.findByPetsFriendsName("Jerry")).isNull();
@@ -4392,8 +4434,10 @@ class RepositoryIT {
 		@Test // GH-2243
 		void findDistinctByRelatedEntity(@Autowired RelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Hobby{name: 'Music'})"
-							+ "CREATE (n)-[:Has]->(:Hobby{name: 'Music'})").consume());
+					session.run("""
+							CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Hobby{name: 'Music'})\
+							CREATE (n)-[:Has]->(:Hobby{name: 'Music'})\
+							""").consume());
 
 			assertThat(repository.findDistinctByHobbiesName("Music")).isNotNull();
 
@@ -4480,9 +4524,10 @@ class RepositoryIT {
 
 		@Override
 		void setupData(TransactionContext transaction) {
-			transaction.run(""
-							+ "create (p:ParentNode:ExtendedParentNode {someAttribute: 'Foo', someOtherAttribute: 'Bar'})"
-							+ "create (p) -[:CONNECTED_TO]-> (:PersonWithAllConstructor {name: 'Bazbar'})");
+			transaction.run("""
+							create (p:ParentNode:ExtendedParentNode {someAttribute: 'Foo', someOtherAttribute: 'Bar'})\
+							create (p) -[:CONNECTED_TO]-> (:PersonWithAllConstructor {name: 'Bazbar'})\
+							""");
 		}
 
 		@Test
@@ -4543,8 +4588,10 @@ class RepositoryIT {
 
 	interface PetRepository extends Neo4jRepository<Pet, Long> {
 
-		@Query("MATCH (p:Pet)-[r1:Has]->(p2:Pet)-[r2:Has]->(p3:Pet) " +
-			   "where id(p) = $petNode1Id return p, collect(r1), collect(p2), collect(r2), collect(p3)")
+		@Query("""
+			   MATCH (p:Pet)-[r1:Has]->(p2:Pet)-[r2:Has]->(p3:Pet) \
+			   where id(p) = $petNode1Id return p, collect(r1), collect(p2), collect(r2), collect(p3)\
+			   """)
 		Pet customQueryWithDeepRelationshipMapping(@Param("petNode1Id") long petNode1Id);
 		@Query(value = "MATCH (p:Pet) return p SKIP $skip LIMIT $limit", countQuery = "MATCH (p:Pet) return count(p)")
 		Page<Pet> pagedPets(Pageable pageable);
@@ -4574,9 +4621,11 @@ class RepositoryIT {
 		@Query("MATCH (n:Pet) where n.name='Luna' OPTIONAL MATCH (n)-[r:Has]->(m:Pet) return n, collect(r), collect(m)")
 		List<Pet> findLunas();
 
-		@Query("MATCH (p:Pet)"
-				+ " OPTIONAL MATCH (p)-[rel:Has]->(op)"
-				+ " RETURN p, collect(rel), collect(op)")
+		@Query("""
+				MATCH (p:Pet)\
+				 OPTIONAL MATCH (p)-[rel:Has]->(op)\
+				 RETURN p, collect(rel), collect(op)\
+				""")
 		List<Pet> findAllFriends();
 	}
 
@@ -4607,14 +4656,18 @@ class RepositoryIT {
 
 	interface RelationshipRepository extends Neo4jRepository<PersonWithRelationship, Long> {
 
-		@Query("MATCH (n:PersonWithRelationship{name:'Freddie'}) "
-			   + "OPTIONAL MATCH (n)-[r1:Has]->(p:Pet) WITH n, collect(r1) as petRels, collect(p) as pets "
-			   + "OPTIONAL MATCH (n)-[r2:Has]->(h:Hobby) "
-			   + "return n, petRels, pets, collect(r2) as hobbyRels, collect(h) as hobbies")
+		@Query("""
+			   MATCH (n:PersonWithRelationship{name:'Freddie'}) \
+			   OPTIONAL MATCH (n)-[r1:Has]->(p:Pet) WITH n, collect(r1) as petRels, collect(p) as pets \
+			   OPTIONAL MATCH (n)-[r2:Has]->(h:Hobby) \
+			   return n, petRels, pets, collect(r2) as hobbyRels, collect(h) as hobbies\
+			   """)
 		PersonWithRelationship getPersonWithRelationshipsViaQuery();
 
-		@Query("MATCH p=(n:PersonWithRelationship{name:'Freddie'})-[:Has*]->(something) "
-			   + "return n, collect(relationships(p)), collect(nodes(p))")
+		@Query("""
+			   MATCH p=(n:PersonWithRelationship{name:'Freddie'})-[:Has*]->(something) \
+			   return n, collect(relationships(p)), collect(nodes(p))\
+			   """)
 		PersonWithRelationship getPersonWithRelationshipsViaPathQuery();
 
 		PersonWithRelationship findByPetsName(String petName);
@@ -4634,65 +4687,69 @@ class RepositoryIT {
 		PersonWithRelationship findByPetsFriendsName(String petName);
 
 		@Transactional
-		@Query("CREATE (n:PersonWithRelationship) \n"
-			   + "SET n.name = $0.__properties__.name  \n"
-			   + "WITH n, id(n) as parentId\n"
-			   + "UNWIND $0.__properties__.Has as x\n"
-			   + "CALL { WITH x, parentId\n"
-			   + " \n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Pet'\n"
-			   + " CREATE (p:Pet {name: x.__properties__.name}) <- [r:Has] - (_)\n"
-			   + " RETURN p, r\n"
-			   + " \n"
-			   + " UNION\n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Hobby'\n"
-			   + " CREATE (p:Hobby {name: x.__properties__.name}) <- [r:Has] - (_)\n"
-			   + " RETURN p, r\n"
-			   + "\n"
-			   + " UNION\n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Club'\n"
-			   + " CREATE (p:Club {name: x.__properties__.name}) - [r:Has] -> (_)\n"
-			   + " RETURN p, r\n"
-			   + "\n"
-			   + "}\n"
-			   + "RETURN n, collect(r), collect(p)")
+		@Query("""
+			   CREATE (n:PersonWithRelationship)\s
+			   SET n.name = $0.__properties__.name \s
+			   WITH n, id(n) as parentId
+			   UNWIND $0.__properties__.Has as x
+			   CALL { WITH x, parentId
+			   \s
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Pet'
+			    CREATE (p:Pet {name: x.__properties__.name}) <- [r:Has] - (_)
+			    RETURN p, r
+			   \s
+			    UNION
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Hobby'
+			    CREATE (p:Hobby {name: x.__properties__.name}) <- [r:Has] - (_)
+			    RETURN p, r
+			   
+			    UNION
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Club'
+			    CREATE (p:Club {name: x.__properties__.name}) - [r:Has] -> (_)
+			    RETURN p, r
+			   
+			   }
+			   RETURN n, collect(r), collect(p)\
+			   """)
 		PersonWithRelationship createWithCustomQuery(PersonWithRelationship p);
 
 		@Transactional
-		@Query("UNWIND $0 AS pwr WITH pwr CREATE (n:PersonWithRelationship) \n"
-			   + "SET n.name = pwr.__properties__.name  \n"
-			   + "WITH pwr, n, id(n) as parentId\n"
-			   + "UNWIND pwr.__properties__.Has as x\n"
-			   + "CALL { WITH x, parentId\n"
-			   + " \n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Pet'\n"
-			   + " CREATE (p:Pet {name: x.__properties__.name}) <- [r:Has] - (_)\n"
-			   + " RETURN p, r\n"
-			   + " \n"
-			   + " UNION\n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Hobby'\n"
-			   + " CREATE (p:Hobby {name: x.__properties__.name}) <- [r:Has] - (_)\n"
-			   + " RETURN p, r\n"
-			   + "\n"
-			   + " UNION\n"
-			   + " WITH x, parentId\n"
-			   + " MATCH (_) \n"
-			   + " WHERE id(_) = parentId AND x.__labels__[0] = 'Club'\n"
-			   + " CREATE (p:Club {name: x.__properties__.name}) - [r:Has] -> (_)\n"
-			   + " RETURN p, r\n"
-			   + "\n"
-			   + "}\n"
-			   + "RETURN n, collect(r), collect(p)")
+		@Query("""
+			   UNWIND $0 AS pwr WITH pwr CREATE (n:PersonWithRelationship)\s
+			   SET n.name = pwr.__properties__.name \s
+			   WITH pwr, n, id(n) as parentId
+			   UNWIND pwr.__properties__.Has as x
+			   CALL { WITH x, parentId
+			   \s
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Pet'
+			    CREATE (p:Pet {name: x.__properties__.name}) <- [r:Has] - (_)
+			    RETURN p, r
+			   \s
+			    UNION
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Hobby'
+			    CREATE (p:Hobby {name: x.__properties__.name}) <- [r:Has] - (_)
+			    RETURN p, r
+			   
+			    UNION
+			    WITH x, parentId
+			    MATCH (_)\s
+			    WHERE id(_) = parentId AND x.__labels__[0] = 'Club'
+			    CREATE (p:Club {name: x.__properties__.name}) - [r:Has] -> (_)
+			    RETURN p, r
+			   
+			   }
+			   RETURN n, collect(r), collect(p)\
+			   """)
 		List<PersonWithRelationship> createManyWithCustomQuery(Collection<PersonWithRelationship> p);
 
 		PersonWithRelationship.PersonWithHobby findDistinctByHobbiesName(String hobbyName);
@@ -4737,9 +4794,11 @@ class RepositoryIT {
 	interface SuperBaseClassWithRelationshipPropertiesRepository
 			extends Neo4jRepository<Inheritance.SuperBaseClassWithRelationshipProperties, Long> {
 
-		@Query("MATCH (n:SuperBaseClassWithRelationshipProperties)" +
-			   "-[h:HAS]->" +
-			   "(m:SuperBaseClass) return n, collect(h), collect(m)")
+		@Query("""
+			   MATCH (n:SuperBaseClassWithRelationshipProperties)\
+			   -[h:HAS]->\
+			   (m:SuperBaseClass) return n, collect(h), collect(m)\
+			   """)
 		List<Inheritance.SuperBaseClassWithRelationshipProperties> getAllWithHasRelationships();
 
 	}

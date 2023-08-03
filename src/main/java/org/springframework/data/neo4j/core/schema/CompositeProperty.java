@@ -298,10 +298,9 @@ final class CompositePropertyConverterFactory implements Neo4jPersistentProperty
 							persistentProperty));
 
 			Type type = typeVariableMap.get(PROPERTY_TYPE_KEY);
-			if (persistentProperty.isCollectionLike() && type instanceof ParameterizedType) {
-				ParameterizedType pt = (ParameterizedType) type;
+			if (persistentProperty.isCollectionLike() && type instanceof ParameterizedType pt) {
 				if (persistentProperty.getType().equals(pt.getRawType()) && pt.getActualTypeArguments().length == 1) {
-					type = ((ParameterizedType) type).getActualTypeArguments()[0];
+					type = pt.getActualTypeArguments()[0];
 				}
 			}
 

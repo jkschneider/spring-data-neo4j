@@ -137,8 +137,8 @@ final class Neo4jRepositoryFactory extends RepositoryFactorySupport {
 	protected ProjectionFactory getProjectionFactory() {
 
 		ProjectionFactory projectionFactory = super.getProjectionFactory();
-		if (projectionFactory instanceof SpelAwareProxyProjectionFactory) {
-			((SpelAwareProxyProjectionFactory) projectionFactory).registerMethodInvokerFactory(
+		if (projectionFactory instanceof SpelAwareProxyProjectionFactory factory) {
+			factory.registerMethodInvokerFactory(
 					EntityAndGraphPropertyAccessingMethodInterceptor.createMethodInterceptorFactory(mappingContext));
 		}
 		return projectionFactory;

@@ -271,8 +271,8 @@ public final class NestedRelationshipProcessingStateMachine {
 	@NonNull
 	private Object extractRelatedValueFromRelationshipProperties(Object valueToStore) {
 		Object value;
-		if (valueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder) {
-			value = ((MappingSupport.RelationshipPropertiesWithEntityHolder) valueToStore).getRelatedEntity();
+		if (valueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder holder) {
+			value = holder.getRelatedEntity();
 		} else {
 			value = valueToStore;
 		}

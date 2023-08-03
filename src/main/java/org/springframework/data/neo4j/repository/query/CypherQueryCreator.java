@@ -396,7 +396,7 @@ final class CypherQueryCreator extends AbstractQueryCreator<QueryFragmentsAndPar
 			other = Optional.of(p1);
 		} else {
 			throw new IllegalArgumentException(
-					String.format("The NEAR operation requires a reference point of type %s", Point.class));
+		"The NEAR operation requires a reference point of type %s".formatted(Point.class));
 		}
 
 		Expression distanceFunction = Functions.distance(toCypherProperty(path, false), referencePoint);
@@ -438,12 +438,12 @@ final class CypherQueryCreator extends AbstractQueryCreator<QueryFragmentsAndPar
 
 			return llx.lte(x).and(x.lte(urx)).and(lly.lte(y)).and(y.lte(ury));
 		} else if (area.hasValueOfType(Polygon.class)) {
-			throw new IllegalArgumentException(String.format(
-					"The WITHIN operation does not support a %s, you might want to pass a bounding box instead: %s.of(polygon)",
-					Polygon.class, BoundingBox.class));
+			throw new IllegalArgumentException(
+		"The WITHIN operation does not support a %s, you might want to pass a bounding box instead: %s.of(polygon)".formatted(
+	Polygon.class, BoundingBox.class));
 		} else {
 			throw new IllegalArgumentException(
-					String.format("The WITHIN operation requires an area of type %s or %s", Circle.class, Box.class));
+		"The WITHIN operation requires an area of type %s or %s".formatted(Circle.class, Box.class));
 		}
 	}
 

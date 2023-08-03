@@ -62,7 +62,7 @@ final class TemporalAmountConverter implements GenericConverter {
 		boolean valueIsLiteralNullOrNullValue = value == null || value == Values.NULL;
 		Object convertedValue = valueIsLiteralNullOrNullValue ? null : adapter.apply(((Value) value).asIsoDuration());
 
-		if (convertedValue instanceof IsoDuration && isZero((IsoDuration) convertedValue)) {
+		if (convertedValue instanceof IsoDuration duration && isZero(duration)) {
 			if (Period.class.isAssignableFrom(targetType.getType())) {
 				return Period.of(0, 0, 0);
 			} else if (Duration.class.isAssignableFrom(targetType.getType())) {

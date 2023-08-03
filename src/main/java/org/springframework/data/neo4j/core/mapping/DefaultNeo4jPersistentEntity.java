@@ -235,8 +235,8 @@ final class DefaultNeo4jPersistentEntity<T> extends BasicPersistentEntity<T, Neo
 			}
 		});
 
-		Assert.state(duplicates.isEmpty(), () -> String.format("Duplicate definition of propert%s %s in entity %s",
-				duplicates.size() == 1 ? "y" : "ies", duplicates, getUnderlyingClass()));
+		Assert.state(duplicates.isEmpty(), () -> "Duplicate definition of propert%s %s in entity %s".formatted(
+	duplicates.size() == 1 ? "y" : "ies", duplicates, getUnderlyingClass()));
 	}
 
 	private void verifyDynamicAssociations() {
@@ -263,11 +263,13 @@ final class DefaultNeo4jPersistentEntity<T> extends BasicPersistentEntity<T, Neo
 	private void verifyAssociationsWithProperties() {
 
 		if (this.isRelationshipPropertiesEntity()) {
-			Supplier<String> messageSupplier = () -> String.format(
-					"The class `%s` for the properties of a relationship "
-							+ "is missing a property for the generated, internal ID (`@Id @GeneratedValue Long id`) "
-							+ "which is needed for safely updating properties",
-					this.getUnderlyingClass().getName());
+			Supplier<String> messageSupplier = () -> (
+		"""
+		The class `%s` for the properties of a relationship \
+		is missing a property for the generated, internal ID (`@Id @GeneratedValue Long id`) \
+		which is needed for safely updating properties\
+		""").formatted(
+		this.getUnderlyingClass().getName());
 			Assert.state(this.getIdDescription() != null && this.getIdDescription().isInternallyGeneratedId(), messageSupplier);
 		}
 	}
@@ -283,13 +285,13 @@ final class DefaultNeo4jPersistentEntity<T> extends BasicPersistentEntity<T, Neo
 			String propertyName = persistentProperty.getPropertyName();
 			namesOfPropertiesWithDynamicLabels.add(propertyName);
 
-			Assert.state(persistentProperty.isCollectionLike(), () -> String.format("Property %s on %s must extends %s",
-					persistentProperty.getFieldName(), persistentProperty.getOwner().getType(), Collection.class.getName()));
+			Assert.state(persistentProperty.isCollectionLike(), () -> "Property %s on %s must extends %s".formatted(
+		persistentProperty.getFieldName(), persistentProperty.getOwner().getType(), Collection.class.getName()));
 		});
 
 		Assert.state(namesOfPropertiesWithDynamicLabels.size() <= 1,
-				() -> String.format("Multiple properties in entity %s are annotated with @%s: %s", getUnderlyingClass(),
-						DynamicLabels.class.getSimpleName(), namesOfPropertiesWithDynamicLabels));
+				() -> "Multiple properties in entity %s are annotated with @%s: %s".formatted(getUnderlyingClass(),
+			DynamicLabels.class.getSimpleName(), namesOfPropertiesWithDynamicLabels));
 	}
 
 	/**
@@ -444,10 +446,11 @@ final class DefaultNeo4jPersistentEntity<T> extends BasicPersistentEntity<T, Neo
 
 			var isDeprecated = DEPRECATED_GENERATED_ID_TYPES.contains(idProperty.getActualType());
 			if (isDeprecated) {
-				Supplier<CharSequence> messageSupplier = () -> String.format(""
-						+ "The entity %s is using a Long value for storing internally generated Neo4j ids. "
-						+ "The Neo4j internal Long Ids are deprecated, please consider using an external ID generator.",
-						this.getUnderlyingClass().getName());
+				Supplier<CharSequence> messageSupplier = () -> ("""
+			The entity %s is using a Long value for storing internally generated Neo4j ids. \
+			The Neo4j internal Long Ids are deprecated, please consider using an external ID generator.\
+			""").formatted(
+			this.getUnderlyingClass().getName());
 				log.warn(messageSupplier);
 			}
 

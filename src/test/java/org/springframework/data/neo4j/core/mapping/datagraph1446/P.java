@@ -70,8 +70,10 @@ public class P {
 	}
 
 	@Override public String toString() {
-		return "A{" +
-			   "id=" + id +
+		return """
+			   A{\
+			   id=\
+			   """ + id +
 			   ", name='" + name + '\'' +
 			   ", b=" + b +
 			   ", c=" + c +

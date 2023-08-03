@@ -61,8 +61,10 @@ public class Sku {
 
 	@Override
 	public String toString() {
-		return "Sku{" +
-				"id=" + id +
+		return """
+				Sku{\
+				id=\
+				""" + id +
 				", number=" + number +
 				", name='" + name +
 				'}';

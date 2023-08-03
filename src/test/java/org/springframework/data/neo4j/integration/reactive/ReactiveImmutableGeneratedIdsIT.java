@@ -348,11 +348,13 @@ public class ReactiveImmutableGeneratedIdsIT {
 
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 			List<Record> result = session.run(
-					"MATCH (person3:ImmutablePersonWithGeneratedId) " +
-							"-[:ONBOARDED_BY]->(person2:ImmutablePersonWithGeneratedId) " +
-							"-[:FALLBACK]->(person1:ImmutablePersonWithGeneratedId), " +
-							"(person3)-[:ONBOARDED_BY]->(person1) " +
-							"return person3")
+					"""
+					MATCH (person3:ImmutablePersonWithGeneratedId) \
+					-[:ONBOARDED_BY]->(person2:ImmutablePersonWithGeneratedId) \
+					-[:FALLBACK]->(person1:ImmutablePersonWithGeneratedId), \
+					(person3)-[:ONBOARDED_BY]->(person1) \
+					return person3\
+					""")
 					.list();
 			assertThat(result).hasSize(1);
 		}

@@ -201,15 +201,17 @@ public final class DtoInstantiatingConverter implements Converter<EntityInstance
 		}
 
 		if (!sourceRecord.containsKey(targetPropertyName)) {
-			log.warn(() -> String.format(""
-					+ "Cannot retrieve a value for property `%s` of DTO `%s` and the property will always be null. "
-					+ "Make sure to project only properties of the domain type or use a custom query that "
-					+ "returns a mappable data under the name `%1$s`.", targetPropertyName, targetType.getName()));
+			log.warn(() -> ("""
+		Cannot retrieve a value for property `%s` of DTO `%s` and the property will always be null. \
+		Make sure to project only properties of the domain type or use a custom query that \
+		returns a mappable data under the name `%1$s`.\
+		""").formatted(targetPropertyName, targetType.getName()));
 		} else if (targetProperty.isMap()) {
-			log.warn(() -> String.format(""
-					+ "%s is an additional property to be projected. "
-					+ "However, map properties cannot be projected and the property will always be null.",
-					targetPropertyName));
+			log.warn(() -> ("""
+		%s is an additional property to be projected. \
+		However, map properties cannot be projected and the property will always be null.\
+		""").formatted(
+		targetPropertyName));
 		} else {
 			// We don't support associations on the top level of DTO projects which is somewhat inline with the restrictions
 			// regarding DTO projections as described in https://docs.spring.io/spring-data/jpa/docs/2.4.0-RC1/reference/html/#projections.dtos
@@ -218,9 +220,10 @@ public final class DtoInstantiatingConverter implements Converter<EntityInstance
 
 			Value property = sourceRecord.get(targetPropertyName);
 			if (targetProperty.isCollectionLike() && !typeSystem.LIST().isTypeOf(property)) {
-				log.warn(() -> String.format(""
-						+ "%s is a list property but the selected value is not a list and the property will always be null.",
-						targetPropertyName));
+				log.warn(() -> ("""
+			%s is a list property but the selected value is not a list and the property will always be null.\
+			""").formatted(
+			targetPropertyName));
 			} else {
 				Class<?> actualType = targetProperty.getActualType();
 

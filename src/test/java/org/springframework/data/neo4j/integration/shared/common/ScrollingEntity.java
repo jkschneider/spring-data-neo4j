@@ -94,8 +94,10 @@ public class ScrollingEntity {
 
 	@Override
 	public String toString() {
-		return "ScrollingEntity{" +
-				"a='" + a + '\'' +
+		return """
+				ScrollingEntity{\
+				a='\
+				""" + a + '\'' +
 				", b=" + b +
 				", c=" + c +
 				'}';

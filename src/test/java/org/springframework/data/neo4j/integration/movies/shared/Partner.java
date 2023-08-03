@@ -71,8 +71,10 @@ public class Partner {
 	}
 
 	@Override public String toString() {
-		return "Partner{" +
-			   "id=" + id +
+		return """
+			   Partner{\
+			   id=\
+			   """ + id +
 			   ", code='" + code + '\'' +
 			   ", name='" + name + '\'' +
 			   ", organisations=" + organisations +

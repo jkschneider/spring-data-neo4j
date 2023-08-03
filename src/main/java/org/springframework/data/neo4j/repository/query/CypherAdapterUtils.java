@@ -76,7 +76,7 @@ public final class CypherAdapterUtils {
 
 			var optionalGraphProperty = nodeDescription.getGraphProperty(domainProperty);
 			if (optionalGraphProperty.isEmpty()) {
-				throw new IllegalStateException(String.format("Cannot order by the unknown graph property: '%s'", order.getProperty()));
+				throw new IllegalStateException("Cannot order by the unknown graph property: '%s'".formatted(order.getProperty()));
 			}
 			var graphProperty = optionalGraphProperty.get();
 			Expression expression;

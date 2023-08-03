@@ -57,8 +57,8 @@ final class DefaultNeo4jIsNewStrategy implements IsNewStrategy {
 		Class<?> valueType = entityMetaData.getRequiredIdProperty().getType();
 
 		if (idDescription.isExternallyGeneratedId() && valueType.isPrimitive()) {
-			throw new IllegalArgumentException(String.format("Cannot use %s with externally generated, primitive ids",
-					DefaultNeo4jIsNewStrategy.class.getName()));
+			throw new IllegalArgumentException("Cannot use %s with externally generated, primitive ids".formatted(
+		DefaultNeo4jIsNewStrategy.class.getName()));
 		}
 
 		Function<Object, Object> valueLookup;
@@ -124,7 +124,7 @@ final class DefaultNeo4jIsNewStrategy implements IsNewStrategy {
 		}
 
 		throw new IllegalArgumentException(
-				String.format("Could not determine whether %s is new! Unsupported identifier or version property", entity));
+	"Could not determine whether %s is new! Unsupported identifier or version property".formatted(entity));
 
 	}
 }

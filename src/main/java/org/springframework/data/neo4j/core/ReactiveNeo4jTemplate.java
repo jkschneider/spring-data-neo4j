@@ -958,8 +958,8 @@ public final class ReactiveNeo4jTemplate implements
 										.doOnNext(t -> {
 											var relatedInternalId = t.getT1().get();
 											stateMachine.markEntityAsProcessed(relatedValueToStore, relatedInternalId);
-											if (relatedValueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder) {
-												Object entity = ((MappingSupport.RelationshipPropertiesWithEntityHolder) relatedValueToStore).getRelatedEntity();
+											if (relatedValueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder holder) {
+												Object entity = holder.getRelatedEntity();
 												stateMachine.markAsAliased(entity, relatedInternalId);
 											}
 										});
@@ -1193,9 +1193,9 @@ public final class ReactiveNeo4jTemplate implements
 		 */
 		public Mono<T> getSingleResult() {
 			return fetchSpec.one().map(t -> {
-				if (t instanceof LinkedHashSet) {
+				if (t instanceof LinkedHashSet set) {
 					@SuppressWarnings("unchecked")
-					T firstItem = (T) ((LinkedHashSet<?>) t).iterator().next();
+					T firstItem = (T) set.iterator().next();
 					return firstItem;
 				}
 				return t;

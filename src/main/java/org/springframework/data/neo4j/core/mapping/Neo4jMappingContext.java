@@ -504,8 +504,8 @@ public final class Neo4jMappingContext extends AbstractMappingContext<Neo4jPersi
 			} else if (typeVariableMap.containsKey("P")) {
 				propertyType = typeVariableMap.get("P");
 			}
-			forCollection = propertyType instanceof ParameterizedType &&
-							persistentProperty.getType().equals(((ParameterizedType) propertyType).getRawType());
+			forCollection = propertyType instanceof ParameterizedType pt &&
+							persistentProperty.getType().equals(pt.getRawType());
 		}
 
 		return new NullSafeNeo4jPersistentPropertyConverter<>(customConverter, persistentProperty.isComposite(),

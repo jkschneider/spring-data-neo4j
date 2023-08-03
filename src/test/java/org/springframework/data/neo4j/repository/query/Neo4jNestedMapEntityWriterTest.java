@@ -65,9 +65,9 @@ class Neo4jNestedMapEntityWriterTest {
 	private final Neo4jMappingContext mappingContext;
 	private final Condition<Object> isAMap = new Condition<>(Map.class::isInstance, "a map");
 	private final Condition<Object> isAMapValue = new Condition<>(
-			o -> o instanceof Value && InternalTypeSystem.TYPE_SYSTEM.MAP().isTypeOf((Value) o), "a map value");
+			o -> o instanceof Value v && InternalTypeSystem.TYPE_SYSTEM.MAP().isTypeOf(v), "a map value");
 	private final Condition<Object> isAListValue = new Condition<>(
-			o -> o instanceof Value && InternalTypeSystem.TYPE_SYSTEM.LIST().isTypeOf((Value) o), "a list value");
+			o -> o instanceof Value v && InternalTypeSystem.TYPE_SYSTEM.LIST().isTypeOf(v), "a list value");
 
 	Neo4jNestedMapEntityWriterTest() {
 
@@ -716,8 +716,10 @@ class Neo4jNestedMapEntityWriterTest {
 
 		@Override
 		public String toString() {
-			return "P1{" +
-					"prop1='" + prop1 + '\'' +
+			return """
+					P1{\
+					prop1='\
+					""" + prop1 + '\'' +
 					", prop2='" + prop2 + '\'' +
 					'}';
 		}

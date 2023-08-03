@@ -31,7 +31,7 @@ public final class UnknownEntityException extends InvalidDataAccessApiUsageExcep
 	private final Class<?> targetClass;
 
 	public UnknownEntityException(Class<?> targetClass) {
-		super(String.format("%s is not a known entity", targetClass.getName()));
+		super("%s is not a known entity".formatted(targetClass.getName()));
 		this.targetClass = targetClass;
 	}
 

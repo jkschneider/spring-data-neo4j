@@ -326,11 +326,13 @@ public class ImmutableExternallyGeneratedIdsIT {
 
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 			List<Record> result = session.run(
-					"MATCH (person3:ImmutablePersonWithExternallyGeneratedId) " +
-							"-[:ONBOARDED_BY]->(person2:ImmutablePersonWithExternallyGeneratedId) " +
-							"-[:FALLBACK]->(person1:ImmutablePersonWithExternallyGeneratedId), " +
-							"(person3)-[:ONBOARDED_BY]->(person1) " +
-							"return person3")
+					"""
+					MATCH (person3:ImmutablePersonWithExternallyGeneratedId) \
+					-[:ONBOARDED_BY]->(person2:ImmutablePersonWithExternallyGeneratedId) \
+					-[:FALLBACK]->(person1:ImmutablePersonWithExternallyGeneratedId), \
+					(person3)-[:ONBOARDED_BY]->(person1) \
+					return person3\
+					""")
 					.list();
 			assertThat(result).hasSize(1);
 		}

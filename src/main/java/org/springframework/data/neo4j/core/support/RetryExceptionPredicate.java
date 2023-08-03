@@ -53,8 +53,8 @@ public final class RetryExceptionPredicate implements Predicate<Throwable> {
 			ex = throwable.getCause();
 		}
 
-		if (ex instanceof TransientException) {
-			String code = ((TransientException) ex).code();
+		if (ex instanceof TransientException exception) {
+			String code = exception.code();
 			return !("Neo.TransientError.Transaction.Terminated".equals(code) ||
 					"Neo.TransientError.Transaction.LockClientStopped".equals(code));
 		} else {

@@ -185,7 +185,7 @@ class ReactiveRepositoryIT {
 			transaction.run("CREATE (a:Thing {theId: 'anId', name: 'Homer'})-[:Has]->(b:Thing2{theId: 4711, name: 'Bart'})");
 			IntStream.rangeClosed(1, 20).forEach(i -> transaction
 					.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})", Values
-							.parameters("i", String.format("%02d", i))));
+							.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, null);
@@ -874,7 +874,7 @@ class ReactiveRepositoryIT {
 			transaction.run("CREATE (a:Thing {theId: 'anId', name: 'Homer'})-[:Has]->(b:Thing2{theId: 4711, name: 'Bart'})");
 			IntStream.rangeClosed(1, 20).forEach(i -> transaction
 					.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})", Values
-							.parameters("i", String.format("%02d", i))));
+							.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, null);
@@ -1441,10 +1441,12 @@ class ReactiveRepositoryIT {
 		void loadSameNodeWithDoubleRelationship(@Autowired ReactiveHobbyWithRelationshipWithPropertiesRepository repository) {
 
 			long personId = doWithSession(session -> {
-				Record record = session.run("CREATE (n:AltPerson{name:'Freddie'})," +
-						" (n)-[l1:LIKES {rating: 5}]->(h1:AltHobby{name:'Music'})," +
-						" (n)-[l2:LIKES {rating: 1}]->(h1)" +
-						" RETURN n, h1").single();
+				Record record = session.run("""
+						CREATE (n:AltPerson{name:'Freddie'}),\
+						 (n)-[l1:LIKES {rating: 5}]->(h1:AltHobby{name:'Music'}),\
+						 (n)-[l2:LIKES {rating: 1}]->(h1)\
+						 RETURN n, h1\
+						""").single();
 				return TestIdentitySupport.getInternalId(record.get("n").asNode());
 			});
 
@@ -1482,8 +1484,10 @@ class ReactiveRepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntitiesOr(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-				session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),"
-						+ "(n)-[:Has]->(:Hobby{name: 'Music'})").consume());
+				session.run("""
+						CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),\
+						(n)-[:Has]->(:Hobby{name: 'Music'})\
+						""").consume());
 
 			StepVerifier.create(repository.findByHobbiesNameOrPetsName("Music", "Jerry"))
 					.assertNext(person -> assertThat(person.getName()).isEqualTo("Freddie")).verifyComplete();
@@ -1496,8 +1500,10 @@ class ReactiveRepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntitiesAnd(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),"
-						+ "(n)-[:Has]->(:Hobby{name: 'Music'})").consume()
+					session.run("""
+						CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Tom'}),\
+						(n)-[:Has]->(:Hobby{name: 'Music'})\
+						""").consume()
 			);
 
 			StepVerifier.create(repository.findByHobbiesNameAndPetsName("Music", "Tom"))
@@ -1509,8 +1515,10 @@ class ReactiveRepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntityOfRelatedEntity(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})"
-						+ "-[:Has]->(:Hobby{name: 'Sleeping'})").consume()
+					session.run("""
+						CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})\
+						-[:Has]->(:Hobby{name: 'Sleeping'})\
+						""").consume()
 			);
 
 			StepVerifier.create(repository.findByPetsHobbiesName("Sleeping"))
@@ -1522,8 +1530,10 @@ class ReactiveRepositoryIT {
 		@Test
 		void findByPropertyOnRelatedEntityOfRelatedSameEntity(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-					session.run("CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})"
-						+ "-[:Has]->(:Pet{name: 'Tom'})").consume()
+					session.run("""
+						CREATE (:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Pet{name: 'Jerry'})\
+						-[:Has]->(:Pet{name: 'Tom'})\
+						""").consume()
 			);
 
 			StepVerifier.create(repository.findByPetsFriendsName("Tom"))
@@ -1535,8 +1545,10 @@ class ReactiveRepositoryIT {
 		@Test // GH-2243
 		void findDistinctByRelatedEntity(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-				session.run("CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Hobby{name: 'Music'})"
-						+ "CREATE (n)-[:Has]->(:Hobby{name: 'Music'})").consume());
+				session.run("""
+						CREATE (n:PersonWithRelationship{name:'Freddie'})-[:Has]->(:Hobby{name: 'Music'})\
+						CREATE (n)-[:Has]->(:Hobby{name: 'Music'})\
+						""").consume());
 
 			StepVerifier.create(repository.findDistinctByHobbiesName("Music"))
 					.assertNext(person -> assertThat(person).isNotNull())
@@ -1628,7 +1640,7 @@ class ReactiveRepositoryIT {
 			transaction.run("CREATE (a:Thing {theId: 'anId', name: 'Homer'})-[:Has]->(b:Thing2{theId: 4711, name: 'Bart'})");
 			IntStream.rangeClosed(1, 20).forEach(i -> transaction
 					.run("CREATE (a:Thing {theId: 'id' + $i, name: 'name' + $i})", Values
-							.parameters("i", String.format("%02d", i))));
+							.parameters("i", "%02d".formatted(i))));
 
 			person1 = new PersonWithAllConstructor(id1, TEST_PERSON1_NAME, TEST_PERSON1_FIRST_NAME, TEST_PERSON_SAMEVALUE,
 					true, 1L, TEST_PERSON1_BORN_ON, "something", Arrays.asList("a", "b"), NEO4J_HQ, null);
@@ -1819,8 +1831,10 @@ class ReactiveRepositoryIT {
 
 			doWithSession(session ->
 				session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]->(:SimplePerson) return id(r) as rId").consume())
+						tx.run("""
+								CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+								""").consume())
 			);
 
 			ThingWithFixedGeneratedId thing = new ThingWithFixedGeneratedId("name");
@@ -1831,8 +1845,10 @@ class ReactiveRepositoryIT {
 			// ensure that no relationship got deleted upfront
 			assertInSession(session -> {
 				Long relCount = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]-(:SimplePerson) return count(r) as rCount")
+						tx.run("""
+								MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]-(:SimplePerson) return count(r) as rCount\
+								""")
 								.next().get("rCount").asLong());
 
 				assertThat(relCount).isEqualTo(2);
@@ -1844,8 +1860,10 @@ class ReactiveRepositoryIT {
 				@Autowired ThingWithFixedGeneratedIdRepository repository) {
 
 			Long rId = doWithSession(session -> session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]->(:SimplePerson) return id(r) as rId")
+						tx.run("""
+								CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+								""")
 								.next().get("rId").asLong())
 			);
 
@@ -1854,8 +1872,10 @@ class ReactiveRepositoryIT {
 
 			assertInSession(session -> {
 				Long newRid = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]-(:SimplePerson) return id(r) as rId")
+						tx.run("""
+								MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]-(:SimplePerson) return id(r) as rId\
+								""")
 								.next().get("rId").asLong());
 
 				assertThat(rId).isNotEqualTo(newRid);
@@ -1868,8 +1888,10 @@ class ReactiveRepositoryIT {
 
 			doWithSession(session ->
 				session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]->(:SimplePerson) return id(r) as rId").consume())
+						tx.run("""
+								CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+								""").consume())
 			);
 
 			ThingWithFixedGeneratedId thing = new ThingWithFixedGeneratedId("name");
@@ -1880,8 +1902,10 @@ class ReactiveRepositoryIT {
 			// ensure that no relationship got deleted upfront
 			assertInSession(session -> {
 				Long relCount = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]-(:SimplePerson) return count(r) as rCount")
+						tx.run("""
+								MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]-(:SimplePerson) return count(r) as rCount\
+								""")
 								.next().get("rCount").asLong());
 
 				assertThat(relCount).isEqualTo(2);
@@ -1894,8 +1918,10 @@ class ReactiveRepositoryIT {
 
 			Long rId = doWithSession(session ->
 				session.executeWrite(tx ->
-						tx.run("CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]->(:SimplePerson) return id(r) as rId")
+						tx.run("""
+								CREATE (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]->(:SimplePerson) return id(r) as rId\
+								""")
 								.next().get("rId").asLong())
 			);
 
@@ -1905,8 +1931,10 @@ class ReactiveRepositoryIT {
 
 			assertInSession(session -> {
 				Long newRid = session.executeRead(tx ->
-						tx.run("MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})" +
-								"-[r:KNOWS]-(:SimplePerson) return id(r) as rId")
+						tx.run("""
+								MATCH (:ThingWithFixedGeneratedId{theId:'ThingWithFixedGeneratedId'})\
+								-[r:KNOWS]-(:SimplePerson) return id(r) as rId\
+								""")
 								.next().get("rId").asLong());
 
 				assertThat(rId).isNotEqualTo(newRid);
@@ -2209,8 +2237,10 @@ class ReactiveRepositoryIT {
 			StepVerifier.create(repository.save(start)).expectNextCount(1).verifyComplete();
 
 			assertInSession(session -> {
-				List<Record> records = session.run("MATCH (end:BidirectionalEnd)<-[r:CONNECTED]-(start:BidirectionalStart)" +
-						" RETURN start, r, end").list();
+				List<Record> records = session.run("""
+						MATCH (end:BidirectionalEnd)<-[r:CONNECTED]-(start:BidirectionalStart)\
+						 RETURN start, r, end\
+						""").list();
 
 				assertThat(records).hasSize(1);
 			});
@@ -2397,8 +2427,10 @@ class ReactiveRepositoryIT {
 		@Test
 		void deleteCollectionRelationship(@Autowired ReactiveRelationshipRepository repository) {
 			doWithSession(session ->
-				session.run("CREATE (n:PersonWithRelationship{name:'Freddie'}), "
-						+ "(n)-[:Has]->(p1:Pet{name: 'Jerry'}), (n)-[:Has]->(p2:Pet{name: 'Tom'})")
+				session.run("""
+						CREATE (n:PersonWithRelationship{name:'Freddie'}), \
+						(n)-[:Has]->(p1:Pet{name: 'Jerry'}), (n)-[:Has]->(p2:Pet{name: 'Tom'})\
+						""")
 			);
 
 			Publisher<PersonWithRelationship> personLoad = repository.getPersonWithRelationshipsViaQuery().map(person -> {
@@ -2778,10 +2810,12 @@ class ReactiveRepositoryIT {
 
 	interface ReactiveRelationshipRepository extends ReactiveNeo4jRepository<PersonWithRelationship, Long> {
 
-		@Query("MATCH (n:PersonWithRelationship{name:'Freddie'}) "
-				+ "OPTIONAL MATCH (n)-[r1:Has]->(p:Pet) WITH n, collect(r1) as petRels, collect(p) as pets "
-				+ "OPTIONAL MATCH (n)-[r2:Has]->(h:Hobby) "
-				+ "return n, petRels, pets, collect(r2) as hobbyRels, collect(h) as hobbies")
+		@Query("""
+				MATCH (n:PersonWithRelationship{name:'Freddie'}) \
+				OPTIONAL MATCH (n)-[r1:Has]->(p:Pet) WITH n, collect(r1) as petRels, collect(p) as pets \
+				OPTIONAL MATCH (n)-[r2:Has]->(h:Hobby) \
+				return n, petRels, pets, collect(r2) as hobbyRels, collect(h) as hobbies\
+				""")
 		Mono<PersonWithRelationship> getPersonWithRelationshipsViaQuery();
 
 		Mono<PersonWithRelationship> findByPetsName(String petName);

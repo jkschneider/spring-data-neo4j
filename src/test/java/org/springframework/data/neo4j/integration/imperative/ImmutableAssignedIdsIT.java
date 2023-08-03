@@ -344,11 +344,13 @@ public class ImmutableAssignedIdsIT {
 
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 			List<Record> result = session.run(
-					"MATCH (person3:ImmutablePersonWithAssignedId) " +
-							"-[:ONBOARDED_BY]->(person2:ImmutablePersonWithAssignedId) " +
-							"-[:FALLBACK]->(person1:ImmutablePersonWithAssignedId), " +
-							"(person3)-[:ONBOARDED_BY]->(person1) " +
-							"return person3")
+					"""
+					MATCH (person3:ImmutablePersonWithAssignedId) \
+					-[:ONBOARDED_BY]->(person2:ImmutablePersonWithAssignedId) \
+					-[:FALLBACK]->(person1:ImmutablePersonWithAssignedId), \
+					(person3)-[:ONBOARDED_BY]->(person1) \
+					return person3\
+					""")
 					.list();
 			assertThat(result).hasSize(1);
 		}

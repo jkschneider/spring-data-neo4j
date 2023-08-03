@@ -55,8 +55,10 @@ public final class Actor {
 	}
 
 	@Override public String toString() {
-		return "Actor{" +
-			   "person=" + person +
+		return """
+			   Actor{\
+			   person=\
+			   """ + person +
 			   ", roles=" + roles +
 			   '}';
 	}

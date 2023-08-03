@@ -107,10 +107,12 @@ class Neo4jTemplateIT {
 					Values.parameters("name", TEST_PERSON2_NAME)).single().get("id").asLong();
 
 			transaction.run("CREATE (p:Person{firstName: 'A', lastName: 'LA'})");
-			transaction.run("CREATE (p:Person{firstName: 'Michael', lastName: 'Siemons'})" +
-							" -[:LIVES_AT]-> (a:Address {city: 'Aachen', id: 1})" +
-							" -[:BASED_IN]->(c:YetAnotherCountryEntity{name: 'Gemany', countryCode: 'DE'})" +
-							" RETURN id(p)");
+			transaction.run("""
+							CREATE (p:Person{firstName: 'Michael', lastName: 'Siemons'})\
+							 -[:LIVES_AT]-> (a:Address {city: 'Aachen', id: 1})\
+							 -[:BASED_IN]->(c:YetAnotherCountryEntity{name: 'Gemany', countryCode: 'DE'})\
+							 RETURN id(p)\
+							""");
 			transaction.run(
 					"CREATE (p:Person{firstName: 'Helge', lastName: 'Schnitzel'}) -[:LIVES_AT]-> (a:Address {city: 'Mülheim an der Ruhr'}) RETURN id(p)");
 			transaction.run("CREATE (p:Person{firstName: 'Bela', lastName: 'B.'})");

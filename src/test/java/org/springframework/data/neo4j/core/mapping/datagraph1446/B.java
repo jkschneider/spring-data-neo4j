@@ -47,8 +47,10 @@ public class B {
 	}
 
 	@Override public String toString() {
-		return "B{" +
-			   "id=" + id +
+		return """
+			   B{\
+			   id=\
+			   """ + id +
 			   ", name='" + name + '\'' +
 			   '}';
 	}

@@ -106,8 +106,10 @@ class VersionedExternalIdWithEquals implements Relatable<VersionedExternalIdWith
 
 	@Override
 	public String toString() {
-		return "VersionedExternalIdWithEquals{" +
-			   "version=" + version +
+		return """
+			   VersionedExternalIdWithEquals{\
+			   version=\
+			   """ + version +
 			   ", name='" + name + '\'' +
 			   '}';
 	}

@@ -65,15 +65,19 @@ class KotlinIT {
 			 Transaction transaction = session.beginTransaction()
 		) {
 			transaction.run("MATCH (n) detach delete n").consume();
-			transaction.run("CREATE (n:KotlinPerson), "
-					+ " (n)-[:WORKS_IN{since: 2019}]->(:KotlinClub{name: 'Golf club'}) SET n.name = $personName",
+			transaction.run("""
+					CREATE (n:KotlinPerson), \
+					 (n)-[:WORKS_IN{since: 2019}]->(:KotlinClub{name: 'Golf club'}) SET n.name = $personName\
+					""",
 					Values.parameters("personName", PERSON_NAME))
 					.consume();
-			transaction.run("CREATE (p1:TestPerson {id: \"first\", name: \"First name\"})\n"
-							+ "CREATE (p2:TestPerson {id: \"second\"})\n"
-							+ "CREATE (d:TestDepartment {id: \"department\", name: \"Test\"})\n"
-							+ "CREATE (p1)-[:MEMBER_OF]->(d)\n"
-							+ "CREATE (p2)-[:MEMBER_OF]->(d)\n").consume();
+			transaction.run("""
+							CREATE (p1:TestPerson {id: "first", name: "First name"})
+							CREATE (p2:TestPerson {id: "second"})
+							CREATE (d:TestDepartment {id: "department", name: "Test"})
+							CREATE (p1)-[:MEMBER_OF]->(d)
+							CREATE (p2)-[:MEMBER_OF]->(d)
+							""").consume();
 			transaction.commit();
 			bookmarkCapture.seedWith(session.lastBookmarks());
 		}

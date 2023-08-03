@@ -76,8 +76,8 @@ final class DefaultNeo4jConversionService implements Neo4jConversionService {
 		if (conversionOverride == null) {
 			conversion = (v, t) -> conversionService.convert(v, t);
 		} else {
-			applyConversionToCompleteCollection = conversionOverride instanceof NullSafeNeo4jPersistentPropertyConverter
-												  && ((NullSafeNeo4jPersistentPropertyConverter<?>) conversionOverride).isForCollection();
+			applyConversionToCompleteCollection = conversionOverride instanceof NullSafeNeo4jPersistentPropertyConverter nsnppc
+												  && nsnppc.isForCollection();
 			conversion = (v, t) -> conversionOverride.read(v);
 		}
 
@@ -102,7 +102,7 @@ final class DefaultNeo4jConversionService implements Neo4jConversionService {
 			}
 			return valueIsLiteralNullOrNullValue ? null : conversion.apply(value, rawType);
 		} catch (Exception e) {
-			String msg = String.format("Could not convert %s into %s", value, type);
+			String msg = "Could not convert %s into %s".formatted(value, type);
 			throw new TypeMismatchDataAccessException(msg, e);
 		}
 	}
@@ -118,8 +118,8 @@ final class DefaultNeo4jConversionService implements Neo4jConversionService {
 		} else {
 			@SuppressWarnings("unchecked")
 			Neo4jPersistentPropertyConverter<Object> hlp = (Neo4jPersistentPropertyConverter<Object>) writingConverter;
-			applyConversionToCompleteCollection = writingConverter instanceof NullSafeNeo4jPersistentPropertyConverter
-												  && ((NullSafeNeo4jPersistentPropertyConverter<?>) writingConverter).isForCollection();
+			applyConversionToCompleteCollection = writingConverter instanceof NullSafeNeo4jPersistentPropertyConverter nsnppc
+												  && nsnppc.isForCollection();
 			conversion = hlp::write;
 		}
 

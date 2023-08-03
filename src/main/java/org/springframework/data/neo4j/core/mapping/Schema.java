@@ -67,7 +67,7 @@ public interface Schema {
 		NodeDescription<?> nodeDescription = getNodeDescription(primaryLabel);
 		if (nodeDescription == null) {
 			throw new MappingException(
-					String.format("Required node description not found with primary label '%s'", primaryLabel));
+		"Required node description not found with primary label '%s'".formatted(primaryLabel));
 		}
 		return nodeDescription;
 	}

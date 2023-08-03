@@ -82,12 +82,11 @@ public final class NestedRelationshipContext {
 
 	public Object identifyAndExtractRelationshipTargetNode(Object relatedValue) {
 		Object valueToBeSaved = relatedValue;
-		if (relatedValue instanceof Map.Entry) {
-			Map.Entry<?, ?> relatedValueMapEntry = (Map.Entry<?, ?>) relatedValue;
+		if (relatedValue instanceof Map.Entry relatedValueMapEntry) {
 			if (this.hasRelationshipWithProperties()) {
-				Object mapValue = ((Map.Entry<?, ?>) relatedValue).getValue();
+				Object mapValue = relatedValueMapEntry.getValue();
 				// it can be either a scalar entity holder or a list of it
-				mapValue = mapValue instanceof List ? ((List<?>) mapValue).get(0) : mapValue;
+				mapValue = mapValue instanceof List l ? l.get(0) : mapValue;
 				valueToBeSaved = ((MappingSupport.RelationshipPropertiesWithEntityHolder) mapValue).getRelatedEntity();
 			} else if (this.getInverse().isDynamicAssociation()) {
 				valueToBeSaved = relatedValueMapEntry.getValue();
@@ -106,9 +105,9 @@ public final class NestedRelationshipContext {
 			return null;
 		}
 
-		if (relatedValue instanceof Map.Entry) {
-			Object mapValue = ((Map.Entry<?, ?>) relatedValue).getValue();
-			mapValue = mapValue instanceof List ? ((List<?>) mapValue).get(0) : mapValue;
+		if (relatedValue instanceof Map.Entry entry) {
+			Object mapValue = entry.getValue();
+			mapValue = mapValue instanceof List l ? l.get(0) : mapValue;
 			return ((MappingSupport.RelationshipPropertiesWithEntityHolder) mapValue).getRelationshipPropertiesPropertyAccessor();
 		} else {
 			return ((MappingSupport.RelationshipPropertiesWithEntityHolder) relatedValue).getRelationshipPropertiesPropertyAccessor();
@@ -143,8 +142,8 @@ public final class NestedRelationshipContext {
 					relationshipProperties.put(mapEntry.getKey(), relationshipValues);
 					Object mapEntryValue = mapEntry.getValue();
 
-					if (mapEntryValue instanceof List) {
-						for (Object relationshipProperty : ((List<?>) mapEntryValue)) {
+					if (mapEntryValue instanceof List list) {
+						for (Object relationshipProperty :list) {
 							MappingSupport.RelationshipPropertiesWithEntityHolder oneOfThem =
 									new MappingSupport.RelationshipPropertiesWithEntityHolder(
 											relationshipPropertiesEntity, relationshipProperty,

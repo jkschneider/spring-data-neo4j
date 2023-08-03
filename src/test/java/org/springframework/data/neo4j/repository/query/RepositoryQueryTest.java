@@ -111,16 +111,22 @@ final class RepositoryQueryTest {
 	@ValueSource(strings = {
 			"RETURN 1 SKIP $skip LIMIT $limit",
 			"RETURN 1 sKip $skip limit $limit",
-			"match(n) return              $\n"
-			+ "       skip                 \n"
-			+ "       skip                $\n"
-			+ "       skip                 \n"
-			+ "       LIMIT $ limit",
-			"MATCH (n) RETURN n Skip $skip LIMIT /* No */ $ "
-			+ " /* NO */ limit",
+			"""
+			match(n) return              $
+			       skip                \s
+			       skip                $
+			       skip                \s
+			       LIMIT $ limit\
+			""",
+			"""
+			MATCH (n) RETURN n Skip $skip LIMIT /* No */ $ \
+			 /* NO */ limit\
+			""",
 			"MATCH (n) RETURN n Skip $skip LIMIT /* No */$/* NO */ limit",
-			"MATCH (n) RETURN n Skip $skip LIMIT // No, no\n"
-			+ " $ /* really, not a */ limit"
+			"""
+			MATCH (n) RETURN n Skip $skip LIMIT // No, no
+			 $ /* really, not a */ limit\
+			"""
 	})
 	void shouldDetectValidSkipAndLimitPlaceholders(String template) {
 
@@ -630,9 +636,11 @@ final class RepositoryQueryTest {
 		@Query(value = "MATCH (n:Test) RETURN n :#{ orderBy (#pageable.sort)} SKIP $skip LIMIT $limit", countQuery = "MATCH (n:Test) RETURN count(n)")
 		Slice<TestEntity> orderBySpel(Pageable page);
 
-		@Query(value = "MATCH (n:`:#{literal(#aDynamicLabelPt1 + #aDynamicLabelPt2)}`) "
-					   + "SET n.`:#{literal(#aDynamicProperty)}` = :#{literal('''' + #enforcedLiteralValue + '''')} "
-					   + "RETURN n :#{orderBy(#sort)} SKIP $skip LIMIT $limit"
+		@Query(value = """
+					   MATCH (n:`:#{literal(#aDynamicLabelPt1 + #aDynamicLabelPt2)}`) \
+					   SET n.`:#{literal(#aDynamicProperty)}` = :#{literal('''' + #enforcedLiteralValue + '''')} \
+					   RETURN n :#{orderBy(#sort)} SKIP $skip LIMIT $limit\
+					   """
 		)
 		List<TestEntity> makeStaticThingsDynamic(
 				@Param("aDynamicLabelPt1") String aDynamicLabelPt1,

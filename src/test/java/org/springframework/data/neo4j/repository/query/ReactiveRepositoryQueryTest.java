@@ -293,9 +293,11 @@ final class ReactiveRepositoryQueryTest {
 		@Query("MATCH (n:Test) WHERE n.name = $0 OR n.name = $1")
 		Flux<TestEntity> annotatedQueryWithValidTemplate(String name, String anotherName);
 
-		@Query(value = "MATCH (n:`:#{literal(#aDynamicLabelPt1 + #aDynamicLabelPt2)}`) "
-					   + "SET n.`:#{literal(#aDynamicProperty)}` = :#{literal('''' + #enforcedLiteralValue + '''')} "
-					   + "RETURN n :#{orderBy(#sort)} SKIP $skip LIMIT $limit"
+		@Query(value = """
+					   MATCH (n:`:#{literal(#aDynamicLabelPt1 + #aDynamicLabelPt2)}`) \
+					   SET n.`:#{literal(#aDynamicProperty)}` = :#{literal('''' + #enforcedLiteralValue + '''')} \
+					   RETURN n :#{orderBy(#sort)} SKIP $skip LIMIT $limit\
+					   """
 		)
 		Flux<TestEntity> makeStaticThingsDynamic(
 				@Param("aDynamicLabelPt1") String aDynamicLabelPt1,

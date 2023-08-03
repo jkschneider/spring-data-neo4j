@@ -251,8 +251,10 @@ public class DynamicLabelsIT {
 
 		@Override
 		Long createTestEntity(TransactionContext transaction) {
-			Record r = transaction.run("CREATE (e:SimpleDynamicLabelsWithVersion:Foo:Bar:Baz:Foobar {myVersion: 0}) "
-					+ "RETURN id(e) as existingEntityId").single();
+			Record r = transaction.run("""
+					CREATE (e:SimpleDynamicLabelsWithVersion:Foo:Bar:Baz:Foobar {myVersion: 0}) \
+					RETURN id(e) as existingEntityId\
+					""").single();
 			return r.get("existingEntityId").asLong();
 		}
 

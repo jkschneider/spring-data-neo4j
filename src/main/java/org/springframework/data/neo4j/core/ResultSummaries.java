@@ -87,8 +87,8 @@ final class ResultSummaries {
 						.collect(Collectors.joining())).append("^").append(System.lineSeparator());
 			}
 		}
-		return String.format("%s: %s%n%s%s", notification.code(), notification.title(), queryHint,
-				notification.description());
+		return "%s: %s%n%s%s".formatted(notification.code(), notification.title(), queryHint,
+	notification.description());
 	}
 
 	/**

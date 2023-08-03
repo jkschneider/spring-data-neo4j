@@ -144,6 +144,6 @@ public final class ServerVersion {
 		if (major == Integer.MAX_VALUE && minor == Integer.MAX_VALUE && patch == Integer.MAX_VALUE) {
 			return NEO4J_IN_DEV_VERSION_STRING;
 		}
-		return String.format("%s/%s.%s.%s", product, major, minor, patch);
+		return "%s/%s.%s.%s".formatted(product, major, minor, patch);
 	}
 }

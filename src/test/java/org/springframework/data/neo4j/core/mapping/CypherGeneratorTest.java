@@ -58,8 +58,10 @@ class CypherGeneratorTest {
 		Statement statement = CypherGenerator.INSTANCE.prepareSaveOfRelationship(persistentEntity,
 				relationshipDescription, "REL");
 
-		String expectedQuery = "MATCH (startNode:`Entity1`) WHERE startNode.id = $fromId MATCH (endNode)"
-							   + " WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__";
+		String expectedQuery = """
+							   MATCH (startNode:`Entity1`) WHERE startNode.id = $fromId MATCH (endNode)\
+							    WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__\
+							   """;
 		Assertions.assertEquals(expectedQuery, Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build()).render(statement));
 	}
 
@@ -74,8 +76,10 @@ class CypherGeneratorTest {
 				relationshipDescription, "REL");
 
 		String expectedQuery =
-				"MATCH (startNode:`Entity1`:`MultipleLabel`) WHERE startNode.id = $fromId MATCH (endNode)"
-				+ " WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__";
+				"""
+				MATCH (startNode:`Entity1`:`MultipleLabel`) WHERE startNode.id = $fromId MATCH (endNode)\
+				 WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__\
+				""";
 		Assertions.assertEquals(expectedQuery, Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build()).render(statement));
 	}
 
@@ -94,8 +98,10 @@ class CypherGeneratorTest {
 		Statement statement = CypherGenerator.INSTANCE.prepareSaveOfRelationship(persistentEntity,
 				relationshipDescription, "REL");
 
-		String expectedQuery = "MATCH (startNode) WHERE id(startNode) = $fromId MATCH (endNode)"
-							   + " WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__";
+		String expectedQuery = """
+							   MATCH (startNode) WHERE id(startNode) = $fromId MATCH (endNode)\
+							    WHERE elementId(endNode) = $toId MERGE (startNode)<-[relProps:`REL`]-(endNode) RETURN elementId(relProps) AS __elementId__\
+							   """;
 		Assertions.assertEquals(expectedQuery, Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build()).render(statement));
 	}
 

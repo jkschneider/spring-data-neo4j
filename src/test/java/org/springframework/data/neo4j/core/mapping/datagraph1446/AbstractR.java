@@ -57,8 +57,10 @@ public abstract class AbstractR<T> {
 	}
 
 	@Override public String toString() {
-		return "AbstractR{" +
-			   "target=" + target +
+		return """
+			   AbstractR{\
+			   target=\
+			   """ + target +
 			   ", p1='" + p1 + '\'' +
 			   ", p2='" + p2 + '\'' +
 			   '}';

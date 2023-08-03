@@ -261,8 +261,8 @@ public final class Neo4jTransactionManager extends AbstractPlatformTransactionMa
 	private static Neo4jTransactionObject extractNeo4jTransaction(Object transaction) {
 
 		Assert.isInstanceOf(Neo4jTransactionObject.class, transaction,
-				() -> String.format("Expected to find a %s but it turned out to be %s", Neo4jTransactionObject.class,
-						transaction.getClass()));
+				() -> "Expected to find a %s but it turned out to be %s".formatted(Neo4jTransactionObject.class,
+			transaction.getClass()));
 
 		return (Neo4jTransactionObject) transaction;
 	}
@@ -312,7 +312,7 @@ public final class Neo4jTransactionManager extends AbstractPlatformTransactionMa
 
 			TransactionSynchronizationManager.bindResource(this.driver, transactionHolder);
 		} catch (Exception ex) {
-			throw new TransactionSystemException(String.format("Could not open a new Neo4j session: %s", ex.getMessage()),
+			throw new TransactionSystemException("Could not open a new Neo4j session: %s".formatted(ex.getMessage()),
 					ex);
 		}
 	}

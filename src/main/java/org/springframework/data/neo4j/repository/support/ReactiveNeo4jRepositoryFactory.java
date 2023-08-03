@@ -141,10 +141,10 @@ final class ReactiveNeo4jRepositoryFactory extends ReactiveRepositoryFactorySupp
 
 		super.setBeanFactory(beanFactory);
 
-		if (beanFactory instanceof ListableBeanFactory) {
+		if (beanFactory instanceof ListableBeanFactory listableBeanFactory) {
 			addRepositoryProxyPostProcessor((factory, repositoryInformation) -> {
 				ReactivePersistenceExceptionTranslationInterceptor advice = new ReactivePersistenceExceptionTranslationInterceptor(
-						(ListableBeanFactory) beanFactory);
+						listableBeanFactory);
 				factory.addAdvice(advice);
 			});
 		}
@@ -154,8 +154,8 @@ final class ReactiveNeo4jRepositoryFactory extends ReactiveRepositoryFactorySupp
 	protected ProjectionFactory getProjectionFactory() {
 
 		ProjectionFactory projectionFactory = super.getProjectionFactory();
-		if (projectionFactory instanceof SpelAwareProxyProjectionFactory) {
-			((SpelAwareProxyProjectionFactory) projectionFactory).registerMethodInvokerFactory(
+		if (projectionFactory instanceof SpelAwareProxyProjectionFactory factory) {
+			factory.registerMethodInvokerFactory(
 					EntityAndGraphPropertyAccessingMethodInterceptor.createMethodInterceptorFactory(mappingContext));
 		}
 		return projectionFactory;

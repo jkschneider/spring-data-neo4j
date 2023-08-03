@@ -40,7 +40,7 @@ public final class NoRootNodeMappingException extends MappingException implement
 	private Neo4jPersistentEntity<?> entity;
 
 	public NoRootNodeMappingException(MapAccessor mapAccessor, Neo4jPersistentEntity<?> entity) {
-		super(String.format("Could not find mappable nodes or relationships inside %s for %s", mapAccessor, entity));
+		super("Could not find mappable nodes or relationships inside %s for %s".formatted(mapAccessor, entity));
 		this.mapAccessor = mapAccessor;
 		this.entity = entity;
 	}

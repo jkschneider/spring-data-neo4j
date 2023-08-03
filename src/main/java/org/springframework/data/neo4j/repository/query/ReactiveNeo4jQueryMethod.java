@@ -67,13 +67,13 @@ final class ReactiveNeo4jQueryMethod extends Neo4jQueryMethod {
 
 			if (singleWrapperWithWrappedPageableResult) {
 				throw new InvalidDataAccessApiUsageException(
-						String.format("'%s.%s' must not use sliced or paged execution, please use Flux.buffer(size, skip)",
-								ClassUtils.getShortName(method.getDeclaringClass()), method.getName()));
+			"'%s.%s' must not use sliced or paged execution, please use Flux.buffer(size, skip)".formatted(
+		ClassUtils.getShortName(method.getDeclaringClass()), method.getName()));
 			}
 
 			if (!multiWrapper) {
-				throw new IllegalStateException(String.format(
-						"Method has to use a multi-item reactive wrapper return type. Offending method: %s", method.toString()));
+				throw new IllegalStateException(
+			"Method has to use a multi-item reactive wrapper return type. Offending method: %s".formatted(method.toString()));
 			}
 		}
 

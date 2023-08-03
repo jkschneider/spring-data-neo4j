@@ -592,15 +592,15 @@ public final class Neo4jTemplate implements
 		String nameOfParameter = "id";
 		Condition condition = entityMetaData.getIdExpression().isEqualTo(parameter(nameOfParameter));
 
-		log.debug(() -> String.format("Deleting entity with id %s ", id));
+		log.debug(() -> "Deleting entity with id %s ".formatted(id));
 
 		Statement statement = cypherGenerator.prepareDeleteOf(entityMetaData, condition);
 		ResultSummary summary = this.neo4jClient.query(renderer.render(statement))
 				.bind(convertIdValues(entityMetaData.getRequiredIdProperty(), id))
 				.to(nameOfParameter).run();
 
-		log.debug(() -> String.format("Deleted %d nodes and %d relationships.", summary.counters().nodesDeleted(),
-				summary.counters().relationshipsDeleted()));
+		log.debug(() -> "Deleted %d nodes and %d relationships.".formatted(summary.counters().nodesDeleted(),
+	summary.counters().relationshipsDeleted()));
 	}
 
 	@Override
@@ -636,28 +636,28 @@ public final class Neo4jTemplate implements
 		String nameOfParameter = "ids";
 		Condition condition = entityMetaData.getIdExpression().in(parameter(nameOfParameter));
 
-		log.debug(() -> String.format("Deleting all entities with the following ids: %s ", ids));
+		log.debug(() -> "Deleting all entities with the following ids: %s ".formatted(ids));
 
 		Statement statement = cypherGenerator.prepareDeleteOf(entityMetaData, condition);
 		ResultSummary summary = this.neo4jClient.query(renderer.render(statement))
 				.bind(convertIdValues(entityMetaData.getRequiredIdProperty(), ids))
 				.to(nameOfParameter).run();
 
-		log.debug(() -> String.format("Deleted %d nodes and %d relationships.", summary.counters().nodesDeleted(),
-				summary.counters().relationshipsDeleted()));
+		log.debug(() -> "Deleted %d nodes and %d relationships.".formatted(summary.counters().nodesDeleted(),
+	summary.counters().relationshipsDeleted()));
 	}
 
 	@Override
 	public void deleteAll(Class<?> domainType) {
 
 		Neo4jPersistentEntity<?> entityMetaData = neo4jMappingContext.getRequiredPersistentEntity(domainType);
-		log.debug(() -> String.format("Deleting all nodes with primary label %s", entityMetaData.getPrimaryLabel()));
+		log.debug(() -> "Deleting all nodes with primary label %s".formatted(entityMetaData.getPrimaryLabel()));
 
 		Statement statement = cypherGenerator.prepareDeleteOf(entityMetaData);
 		ResultSummary summary = this.neo4jClient.query(renderer.render(statement)).run();
 
-		log.debug(() -> String.format("Deleted %d nodes and %d relationships.", summary.counters().nodesDeleted(),
-				summary.counters().relationshipsDeleted()));
+		log.debug(() -> "Deleted %d nodes and %d relationships.".formatted(summary.counters().nodesDeleted(),
+	summary.counters().relationshipsDeleted()));
 	}
 
 	private <T> ExecutableQuery<T> createExecutableQuery(Class<T> domainType, Statement statement) {
@@ -821,8 +821,8 @@ public final class Neo4jTemplate implements
 					savedEntity = saveRelatedNode(newRelatedObject, targetEntity, includeProperty, currentPropertyPath);
 					relatedInternalId = TemplateSupport.rendererCanUseElementIdIfPresent(renderer, targetEntity) ? savedEntity.elementId() : savedEntity.id();
 					stateMachine.markEntityAsProcessed(relatedValueToStore, relatedInternalId);
-					if (relatedValueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder) {
-						Object entity = ((MappingSupport.RelationshipPropertiesWithEntityHolder) relatedValueToStore).getRelatedEntity();
+					if (relatedValueToStore instanceof MappingSupport.RelationshipPropertiesWithEntityHolder holder) {
+						Object entity = holder.getRelatedEntity();
 						stateMachine.markAsAliased(entity, relatedInternalId);
 					}
 				}
@@ -995,7 +995,7 @@ public final class Neo4jTemplate implements
 				.fetchAs(Entity.class)
 				.one();
 
-		if (targetPersistentEntity.hasVersionProperty() && !optionalSavedNode.isPresent()) {
+		if (targetPersistentEntity.hasVersionProperty() && optionalSavedNode.isEmpty()) {
 			throw new OptimisticLockingFailureException(OPTIMISTIC_LOCKING_ERROR_MESSAGE);
 		}
 

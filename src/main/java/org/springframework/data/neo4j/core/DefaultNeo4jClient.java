@@ -206,10 +206,10 @@ final class DefaultNeo4jClient implements Neo4jClient {
 			String statementTemplate = cypherSupplier.get();
 
 			if (cypherLog.isDebugEnabled()) {
-				cypherLog.debug(() -> String.format("Executing:%s%s", System.lineSeparator(), statementTemplate));
+				cypherLog.debug(() -> "Executing:%s%s".formatted(System.lineSeparator(), statementTemplate));
 
 				if (cypherLog.isTraceEnabled() && !parameters.isEmpty()) {
-					cypherLog.trace(() -> String.format("with parameters:%s%s", System.lineSeparator(), parameters));
+					cypherLog.trace(() -> "with parameters:%s%s".formatted(System.lineSeparator(), parameters));
 				}
 			}
 

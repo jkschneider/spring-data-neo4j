@@ -76,17 +76,13 @@ final class SpatialTypes {
 
 	static Value value(Neo4jPoint object) {
 
-		if (object instanceof CartesianPoint2d) {
-			CartesianPoint2d point = (CartesianPoint2d) object;
+		if (object instanceof CartesianPoint2d point) {
 			return Values.point(point.getSrid(), point.getX(), point.getY());
-		} else if (object instanceof CartesianPoint3d) {
-			CartesianPoint3d point = (CartesianPoint3d) object;
+		} else if (object instanceof CartesianPoint3d point) {
 			return Values.point(point.getSrid(), point.getX(), point.getY(), point.getZ());
-		} else if (object instanceof GeographicPoint2d) {
-			GeographicPoint2d point = (GeographicPoint2d) object;
+		} else if (object instanceof GeographicPoint2d point) {
 			return Values.point(point.getSrid(), point.getLongitude(), point.getLatitude());
-		} else if (object instanceof GeographicPoint3d) {
-			GeographicPoint3d point = (GeographicPoint3d) object;
+		} else if (object instanceof GeographicPoint3d point) {
 			return Values.point(point.getSrid(), point.getLongitude(), point.getLatitude(), point.getHeight());
 		} else {
 			throw new IllegalArgumentException("Unsupported point implementation: " + object.getClass());

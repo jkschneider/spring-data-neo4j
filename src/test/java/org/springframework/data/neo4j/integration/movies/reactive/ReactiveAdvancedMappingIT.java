@@ -309,8 +309,10 @@ class ReactiveAdvancedMappingIT {
 		parameters.put("person1", "Kevin Bacon");
 		parameters.put("person2", "Angela Scope");
 		String cypherQuery =
-				"MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "RETURN allPaths";
+				"""
+				MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				RETURN allPaths\
+				""";
 
 		StepVerifier.create(template.findAll(cypherQuery, parameters, Person.class))
 				.expectNextCount(7)
@@ -329,8 +331,10 @@ class ReactiveAdvancedMappingIT {
 		parameters.put("person1", "Kevin Bacon");
 		parameters.put("person2", "Angela Scope");
 		String cypherQuery =
-				"MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "RETURN collect(allPaths)";
+				"""
+				MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				RETURN collect(allPaths)\
+				""";
 
 		StepVerifier.create(template.findAll(cypherQuery, parameters, Person.class))
 				.expectNextCount(7)
@@ -350,9 +354,11 @@ class ReactiveAdvancedMappingIT {
 		parameters.put("person2", "Angela Scope");
 		parameters.put("requiredMovie", "The Da Vinci Code");
 		String cypherQuery =
-				"MATCH p=shortestPath((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "WHERE size([n IN nodes(p) WHERE n.title = $requiredMovie]) > 0\n"
-				+ "RETURN p";
+				"""
+				MATCH p=shortestPath((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				WHERE size([n IN nodes(p) WHERE n.title = $requiredMovie]) > 0
+				RETURN p\
+				""";
 		StepVerifier.create(template.findAll(cypherQuery, parameters, Person.class))
 				.recordWith(ArrayList::new)
 				.expectNextCount(4)
@@ -382,12 +388,14 @@ class ReactiveAdvancedMappingIT {
 		parameters.put("person2", "Meg Ryan");
 		parameters.put("requiredMovie", "The Da Vinci Code");
 		String cypherQuery =
-				"MATCH p=shortestPath(\n"
-				+ "(p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "WITH p, [n in nodes(p) WHERE n:Movie] as mn\n"
-				+ "UNWIND mn as m\n"
-				+ "MATCH (m) <-[r:DIRECTED]- (d:Person)\n"
-				+ "RETURN p, collect(r), collect(d)";
+				"""
+				MATCH p=shortestPath(
+				(p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				WITH p, [n in nodes(p) WHERE n:Movie] as mn
+				UNWIND mn as m
+				MATCH (m) <-[r:DIRECTED]- (d:Person)
+				RETURN p, collect(r), collect(d)\
+				""";
 		StepVerifier.create(template.findAll(cypherQuery, parameters, Movie.class))
 				.recordWith(ArrayList::new)
 				.expectNextCount(2)

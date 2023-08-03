@@ -265,10 +265,11 @@ public interface PersonRepository extends Neo4jRepository<PersonWithAllConstruct
 
 	DtoPersonProjection findOneByNullable(String nullable);
 
-	@Query(""
-			+ "MATCH (n:PersonWithAllConstructor) where n.name = $name "
-			+ "WITH n MATCH(m:PersonWithAllConstructor) WHERE id(n) <> id(m) "
-			+ "RETURN n, collect(m) AS otherPeople, 4711 AS someLongValue, [21.42, 42.21] AS someDoubles")
+	@Query("""
+			MATCH (n:PersonWithAllConstructor) where n.name = $name \
+			WITH n MATCH(m:PersonWithAllConstructor) WHERE id(n) <> id(m) \
+			RETURN n, collect(m) AS otherPeople, 4711 AS someLongValue, [21.42, 42.21] AS someDoubles\
+			""")
 	List<DtoPersonProjectionContainingAdditionalFields> findAllDtoProjectionsWithAdditionalProperties(@Param("name") String name);
 
 	/**
@@ -294,11 +295,12 @@ public interface PersonRepository extends Neo4jRepository<PersonWithAllConstruct
 		}
 	}
 
-	@Query(""
-		   + "MATCH (n:PersonWithAllConstructor) where n.name = $name "
-		   + "WITH n MATCH(m:PersonWithAllConstructor) WHERE id(n) <> id(m)" +
-			" WITH n, collect(m) as ms "
-		   + "RETURN [{n: n, otherPeople: ms, someLongValue: 4711, someDoubles: [21.42, 42.21]}]")
+	@Query("""
+		   MATCH (n:PersonWithAllConstructor) where n.name = $name \
+		   WITH n MATCH(m:PersonWithAllConstructor) WHERE id(n) <> id(m)\
+		    WITH n, collect(m) as ms \
+		   RETURN [{n: n, otherPeople: ms, someLongValue: 4711, someDoubles: [21.42, 42.21]}]\
+		   """)
 	CustomAggregationOfDto findAllDtoProjectionsWithAdditionalPropertiesAsCustomAggregation(@Param("name") String name);
 
 	@Query("MATCH (n:PersonWithAllConstructor) where n.name = $name return n{.name}")

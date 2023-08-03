@@ -142,7 +142,7 @@ class Neo4jMappingContextTest {
 			Collection<String> expectedRelationships = Arrays.asList("[:OWNS] -> (:BikeNode)", "[:THE_SUPER_BIKE] -> (:BikeNode)");
 			Collection<RelationshipDescription> relationships = description.getRelationships();
 			assertThat(relationships.stream().filter(r -> !r.isDynamic())).allMatch(d -> expectedRelationships
-					.contains(String.format("[:%s] -> (:%s)", d.getType(), d.getTarget().getPrimaryLabel())));
+					.contains("[:%s] -> (:%s)".formatted(d.getType(), d.getTarget().getPrimaryLabel())));
 		});
 
 		NodeDescription<?> optionalBikeNodeDescription = schema.getNodeDescription("BikeNode");
@@ -154,7 +154,7 @@ class Neo4jMappingContextTest {
 			Collection<String> expectedRelationships = Arrays.asList("[:OWNER] -> (:User)", "[:RENTER] -> (:User)");
 			Collection<RelationshipDescription> relationships = description.getRelationships();
 			assertThat(relationships.stream().filter(r -> !r.isDynamic())).allMatch(d -> expectedRelationships
-					.contains(String.format("[:%s] -> (:%s)", d.getType(), d.getTarget().getPrimaryLabel())));
+					.contains("[:%s] -> (:%s)".formatted(d.getType(), d.getTarget().getPrimaryLabel())));
 		});
 
 		Neo4jPersistentEntity<?> bikeNodeEntity = schema.getPersistentEntity(BikeNode.class);

@@ -238,10 +238,11 @@ public class InheritanceMappingIT {
 
 		Long id;
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig()); Transaction transaction = session.beginTransaction()) {
-			id = transaction.run("" +
-					"CREATE (s:SomeInterface3:SomeInterface3a{name:'s'}) " +
-					"-[:RELATED]-> (:SomeInterface3:SomeInterface3b {name:'m'}) " +
-					"-[:RELATED]-> (:SomeInterface3:SomeInterface3a {name:'e'}) RETURN id(s)")
+			id = transaction.run("""
+					CREATE (s:SomeInterface3:SomeInterface3a{name:'s'}) \
+					-[:RELATED]-> (:SomeInterface3:SomeInterface3b {name:'m'}) \
+					-[:RELATED]-> (:SomeInterface3:SomeInterface3a {name:'e'}) RETURN id(s)\
+					""")
 					.single().get(0).asLong();
 			transaction.commit();
 			bookmarkCapture.seedWith(session.lastBookmarks());
@@ -264,11 +265,12 @@ public class InheritanceMappingIT {
 		// tag::interface3[]
 		Long id;
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig()); Transaction transaction = session.beginTransaction()) {
-			id = transaction.run("" +
-				"CREATE (s:ParentModel{name:'s'}) " +
-				"CREATE (s)-[:RELATED_1]-> (:SomeInterface3:SomeInterface3b {name:'3b'}) " +
-				"CREATE (s)-[:RELATED_2]-> (:SomeInterface3:SomeInterface3a {name:'3a'}) " +
-				"RETURN id(s)")
+			id = transaction.run("""
+				CREATE (s:ParentModel{name:'s'}) \
+				CREATE (s)-[:RELATED_1]-> (:SomeInterface3:SomeInterface3b {name:'3b'}) \
+				CREATE (s)-[:RELATED_2]-> (:SomeInterface3:SomeInterface3a {name:'3a'}) \
+				RETURN id(s)\
+				""")
 				.single().get(0).asLong();
 			transaction.commit();
 			// end::interface3[]
@@ -443,14 +445,16 @@ public class InheritanceMappingIT {
 		Record result;
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 
-			result = session.run("CREATE (c:Country:BaseTerritory:BaseEntity{nameEn:'country', countryProperty:'baseCountry'}) " +
-								 "CREATE (c)-[:LINK]->(ca:Country:BaseTerritory:BaseEntity{nameEn:'anotherCountry', countryProperty:'large'}) " +
-								 "CREATE (c)-[:LINK]->(cb:Continent:BaseTerritory:BaseEntity{nameEn:'continent', continentProperty:'small'}) " +
-								 "CREATE (c)-[:LINK]->(:GenericTerritory:BaseTerritory:BaseEntity{nameEn:'generic'}) " +
-								 "CREATE (d:Division:BaseEntity{name:'Division'}) " +
-								 "CREATE (d) -[:IS_ACTIVE_IN] -> (ca)" +
-								 "CREATE (d) -[:IS_ACTIVE_IN] -> (cb)" +
-								 "RETURN id(d) as divisionId, id(c) as territoryId").single();
+			result = session.run("""
+								 CREATE (c:Country:BaseTerritory:BaseEntity{nameEn:'country', countryProperty:'baseCountry'}) \
+								 CREATE (c)-[:LINK]->(ca:Country:BaseTerritory:BaseEntity{nameEn:'anotherCountry', countryProperty:'large'}) \
+								 CREATE (c)-[:LINK]->(cb:Continent:BaseTerritory:BaseEntity{nameEn:'continent', continentProperty:'small'}) \
+								 CREATE (c)-[:LINK]->(:GenericTerritory:BaseTerritory:BaseEntity{nameEn:'generic'}) \
+								 CREATE (d:Division:BaseEntity{name:'Division'}) \
+								 CREATE (d) -[:IS_ACTIVE_IN] -> (ca)\
+								 CREATE (d) -[:IS_ACTIVE_IN] -> (cb)\
+								 RETURN id(d) as divisionId, id(c) as territoryId\
+								 """).single();
 			bookmarkCapture.seedWith(session.lastBookmarks());
 		}
 		return result;
@@ -460,10 +464,12 @@ public class InheritanceMappingIT {
 		Record result;
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 
-			result = session.run("CREATE (p:ParentModel2) " +
-								 "CREATE (p)-[:IS_RELATED_TO]->(:SomeInterface3:SomeInterface3a {name: '3a'}) " +
-								 "CREATE (p)-[:IS_RELATED_TO]->(:SomeInterface3:SomeInterface3b {name: '3b'}) " +
-								 "RETURN p").single();
+			result = session.run("""
+								 CREATE (p:ParentModel2) \
+								 CREATE (p)-[:IS_RELATED_TO]->(:SomeInterface3:SomeInterface3a {name: '3a'}) \
+								 CREATE (p)-[:IS_RELATED_TO]->(:SomeInterface3:SomeInterface3b {name: '3b'}) \
+								 RETURN p\
+								 """).single();
 			bookmarkCapture.seedWith(session.lastBookmarks());
 		}
 		return result;

@@ -145,9 +145,11 @@ abstract class Neo4jQuerySupport {
 
 		Supplier<CharSequence> messageSupplier = () -> {
 			String pointer = name == null || name.trim().isEmpty() ? "An unknown parameter" : "$" + name;
-			return String.format("%s points to a literal `null` value during a comparison. " +
-							"The comparisons will always resolve to false and probably lead to an empty result.",
-					pointer);
+			return ("""
+		%s points to a literal `null` value during a comparison. \
+		The comparisons will always resolve to false and probably lead to an empty result.\
+		""").formatted(
+		pointer);
 		};
 		REPOSITORY_QUERY_LOG.debug(messageSupplier);
 	}
@@ -260,17 +262,19 @@ abstract class Neo4jQuerySupport {
 		if (!(queryContext.hasLiteralReplacementForSort || parameterAccessor.getSort().isUnsorted())) {
 
 			Neo4jQuerySupport.REPOSITORY_QUERY_LOG.warn(() ->
-					String.format(
-							"You passed a sorted request to the custom query for '%s'. SDN won't apply any sort information from that object to the query. "
-							+ "Please specify the order in the query itself and use an unsorted request or use the SpEL extension `:#{orderBy(#sort)}`.",
-							queryContext.repositoryMethodName));
+		(
+	"""
+You passed a sorted request to the custom query for '%s'. SDN won't apply any sort information from that object to the query. \
+Please specify the order in the query itself and use an unsorted request or use the SpEL extension `:#{orderBy(#sort)}`.\
+""").formatted(
+	queryContext.repositoryMethodName));
 
 			String fragment = CypherGenerator.INSTANCE.createOrderByFragment(parameterAccessor.getSort());
 			if (fragment != null) {
 				Neo4jQuerySupport.REPOSITORY_QUERY_LOG.warn(() ->
-						String.format(
-								"One possible order clause matching your page request would be the following fragment:%n%s",
-								fragment));
+			
+		"One possible order clause matching your page request would be the following fragment:%n%s".formatted(
+	fragment));
 			}
 		}
 	}

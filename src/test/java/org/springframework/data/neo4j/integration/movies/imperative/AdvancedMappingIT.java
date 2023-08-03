@@ -173,9 +173,11 @@ class AdvancedMappingIT {
 	void nestedSelfRelationshipsFromCustomQueryShouldWork(@Autowired Neo4jTemplate template) {
 
 		Optional<Partner> optionalPartner = template.findOne(
-				"MATCH p=(partner:Partner {code: $partnerCode})-[:CHILD_ORGANISATIONS*0..4]->(org:Organisation) \n"
-				+ "UNWIND nodes(p) as node UNWIND relationships(p) as rel\n"
-				+ "RETURN partner, collect(distinct node), collect(distinct rel)",
+				"""
+				MATCH p=(partner:Partner {code: $partnerCode})-[:CHILD_ORGANISATIONS*0..4]->(org:Organisation)\s
+				UNWIND nodes(p) as node UNWIND relationships(p) as rel
+				RETURN partner, collect(distinct node), collect(distinct rel)\
+				""",
 				Collections.singletonMap("partnerCode", "partner-one"), Partner.class);
 
 		assertThat(optionalPartner).hasValueSatisfying(p -> {
@@ -345,8 +347,10 @@ class AdvancedMappingIT {
 		parameters.put("person1", "Kevin Bacon");
 		parameters.put("person2", "Angela Scope");
 		String cypherQuery =
-				"MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "RETURN allPaths";
+				"""
+				MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				RETURN allPaths\
+				""";
 
 		List<Person> people = template.findAll(cypherQuery, parameters, Person.class);
 		assertThat(people).hasSize(7);
@@ -364,8 +368,10 @@ class AdvancedMappingIT {
 		parameters.put("person1", "Kevin Bacon");
 		parameters.put("person2", "Angela Scope");
 		String cypherQuery =
-				"MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "RETURN collect(allPaths)";
+				"""
+				MATCH allPaths=allShortestPathS((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				RETURN collect(allPaths)\
+				""";
 
 		List<Person> people = template.findAll(cypherQuery, parameters, Person.class);
 		assertThat(people).hasSize(7);
@@ -384,9 +390,11 @@ class AdvancedMappingIT {
 		parameters.put("person2", "Angela Scope");
 		parameters.put("requiredMovie", "The Da Vinci Code");
 		String cypherQuery =
-				"MATCH p=shortestPath((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "WHERE size([n IN nodes(p) WHERE n.title = $requiredMovie]) > 0\n"
-				+ "RETURN p";
+				"""
+				MATCH p=shortestPath((p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				WHERE size([n IN nodes(p) WHERE n.title = $requiredMovie]) > 0
+				RETURN p\
+				""";
 		List<Person> people = template.findAll(cypherQuery, parameters, Person.class);
 
 		assertThat(people)
@@ -412,12 +420,14 @@ class AdvancedMappingIT {
 		parameters.put("person2", "Meg Ryan");
 		parameters.put("requiredMovie", "The Da Vinci Code");
 		String cypherQuery =
-				"MATCH p=shortestPath(\n"
-				+ "(p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))\n"
-				+ "WITH p, [n in nodes(p) WHERE n:Movie] as mn\n"
-				+ "UNWIND mn as m\n"
-				+ "MATCH (m) <-[r:DIRECTED]- (d:Person)\n"
-				+ "RETURN p, collect(r), collect(d)";
+				"""
+				MATCH p=shortestPath(
+				(p1:Person {name: $person1})-[*]-(p2:Person {name: $person2}))
+				WITH p, [n in nodes(p) WHERE n:Movie] as mn
+				UNWIND mn as m
+				MATCH (m) <-[r:DIRECTED]- (d:Person)
+				RETURN p, collect(r), collect(d)\
+				""";
 		List<Movie> movies = template.findAll(cypherQuery, parameters, Movie.class);
 
 		assertThat(movies)

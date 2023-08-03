@@ -38,20 +38,24 @@ class ResultSummariesTest {
 
 	private static Stream<Arguments> params() {
 		return Stream.of(
-				Arguments.of("match (n) - [r:FOO*] -> (m) RETURN r", 1, 19, ""
-						+ "\tmatch (n) - [r:FOO*] -> (m) RETURN r" + LINE_SEPARATOR
+				Arguments.of("match (n) - [r:FOO*] -> (m) RETURN r", 1, 19, """
+							match (n) - [r:FOO*] -> (m) RETURN r\
+						""" + LINE_SEPARATOR
 						+ "\t                  ^" + LINE_SEPARATOR),
-				Arguments.of("match (n)\n- [r:FOO*] -> (m) RETURN r", 2, 1, ""
-						+ "\tmatch (n)" + LINE_SEPARATOR
+				Arguments.of("match (n)\n- [r:FOO*] -> (m) RETURN r", 2, 1, """
+							match (n)\
+						""" + LINE_SEPARATOR
 						+ "\t- [r:FOO*] -> (m) RETURN r" + LINE_SEPARATOR
 						+ "\t^" + LINE_SEPARATOR),
-				Arguments.of("match (x0123456789) \nwith x0123456789\nmatch(n) - [r:FOO*] -> (m) RETURN r", 3, 10, ""
-						+ "\tmatch (x0123456789) " + LINE_SEPARATOR
+				Arguments.of("match (x0123456789) \nwith x0123456789\nmatch(n) - [r:FOO*] -> (m) RETURN r", 3, 10, """
+							match (x0123456789) \
+						""" + LINE_SEPARATOR
 						+ "\twith x0123456789" + LINE_SEPARATOR
 						+ "\tmatch(n) - [r:FOO*] -> (m) RETURN r" + LINE_SEPARATOR
 						+ "\t         ^" + LINE_SEPARATOR),
-				Arguments.of("match (n)                  \n-        [r:FOO*] -> (m) \nRETURN r", 2, 1, ""
-						+ "\tmatch (n)                  " + LINE_SEPARATOR
+				Arguments.of("match (n)                  \n-        [r:FOO*] -> (m) \nRETURN r", 2, 1, """
+							match (n)                  \
+						""" + LINE_SEPARATOR
 						+ "\t-        [r:FOO*] -> (m) " + LINE_SEPARATOR
 						+ "\t^" + LINE_SEPARATOR
 						+ "\tRETURN r" + LINE_SEPARATOR)

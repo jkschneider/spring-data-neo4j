@@ -149,9 +149,9 @@ class Neo4jQueryMethod extends QueryMethod {
 		public String getPlaceholder() {
 
 			if (isNamedParameter()) {
-				return String.format(NAMED_PARAMETER_TEMPLATE, getName().get());
+				return NAMED_PARAMETER_TEMPLATE.formatted(getName().get());
 			} else {
-				return String.format(POSITION_PARAMETER_TEMPLATE, getIndex());
+				return POSITION_PARAMETER_TEMPLATE.formatted(getIndex());
 			}
 		}
 

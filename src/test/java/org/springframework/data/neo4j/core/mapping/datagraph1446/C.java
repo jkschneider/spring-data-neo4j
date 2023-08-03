@@ -47,8 +47,10 @@ public class C {
 	}
 
 	@Override public String toString() {
-		return "C{" +
-			   "id=" + id +
+		return """
+			   C{\
+			   id=\
+			   """ + id +
 			   ", name='" + name + '\'' +
 			   '}';
 	}

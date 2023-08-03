@@ -63,37 +63,37 @@ public final class Neo4jPersistenceExceptionTranslator implements PersistenceExc
 	@Override
 	public DataAccessException translateExceptionIfPossible(RuntimeException ex) {
 
-		if (ex instanceof DataAccessException) {
-			return (DataAccessException) ex;
-		} else if (ex instanceof DiscoveryException) {
-			return translateImpl((Neo4jException) ex, TransientDataAccessResourceException::new);
-		} else if (ex instanceof DatabaseException) {
-			return translateImpl((Neo4jException) ex, NonTransientDataAccessResourceException::new);
-		} else if (ex instanceof ServiceUnavailableException) {
-			return translateImpl((Neo4jException) ex, TransientDataAccessResourceException::new);
-		} else if (ex instanceof SessionExpiredException) {
-			return translateImpl((Neo4jException) ex, TransientDataAccessResourceException::new);
-		} else if (ex instanceof ProtocolException) {
-			return translateImpl((Neo4jException) ex, NonTransientDataAccessResourceException::new);
-		} else if (ex instanceof TransientException) {
-			return translateImpl((Neo4jException) ex, TransientDataAccessResourceException::new);
-		} else if (ex instanceof ValueException) {
-			return translateImpl((Neo4jException) ex, InvalidDataAccessApiUsageException::new);
-		} else if (ex instanceof AuthenticationException) {
-			return translateImpl((Neo4jException) ex, PermissionDeniedDataAccessException::new);
-		} else if (ex instanceof ResultConsumedException) {
-			return translateImpl((Neo4jException) ex, InvalidDataAccessApiUsageException::new);
-		} else if (ex instanceof FatalDiscoveryException) {
-			return translateImpl((Neo4jException) ex, NonTransientDataAccessResourceException::new);
-		} else if (ex instanceof TransactionNestingException) {
-			return translateImpl((Neo4jException) ex, InvalidDataAccessApiUsageException::new);
-		} else if (ex instanceof ClientException) {
-			return translateImpl((Neo4jException) ex, InvalidDataAccessResourceUsageException::new);
+		if (ex instanceof DataAccessException exception) {
+			return exception;
+		} else if (ex instanceof DiscoveryException exception) {
+			return translateImpl(exception, TransientDataAccessResourceException::new);
+		} else if (ex instanceof DatabaseException exception) {
+			return translateImpl(exception, NonTransientDataAccessResourceException::new);
+		} else if (ex instanceof ServiceUnavailableException exception) {
+			return translateImpl(exception, TransientDataAccessResourceException::new);
+		} else if (ex instanceof SessionExpiredException exception) {
+			return translateImpl(exception, TransientDataAccessResourceException::new);
+		} else if (ex instanceof ProtocolException exception) {
+			return translateImpl(exception, NonTransientDataAccessResourceException::new);
+		} else if (ex instanceof TransientException exception) {
+			return translateImpl(exception, TransientDataAccessResourceException::new);
+		} else if (ex instanceof ValueException exception) {
+			return translateImpl(exception, InvalidDataAccessApiUsageException::new);
+		} else if (ex instanceof AuthenticationException exception) {
+			return translateImpl(exception, PermissionDeniedDataAccessException::new);
+		} else if (ex instanceof ResultConsumedException exception) {
+			return translateImpl(exception, InvalidDataAccessApiUsageException::new);
+		} else if (ex instanceof FatalDiscoveryException exception) {
+			return translateImpl(exception, NonTransientDataAccessResourceException::new);
+		} else if (ex instanceof TransactionNestingException exception) {
+			return translateImpl(exception, InvalidDataAccessApiUsageException::new);
+		} else if (ex instanceof ClientException exception) {
+			return translateImpl(exception, InvalidDataAccessResourceUsageException::new);
 		} else if (ex instanceof Neo4jClient.IllegalDatabaseNameException) {
 			return null;
 		}
 
-		log.warn(() -> String.format("Don't know how to translate exception of type %s", ex.getClass()));
+		log.warn(() -> "Don't know how to translate exception of type %s".formatted(ex.getClass()));
 		return null;
 	}
 
@@ -101,7 +101,7 @@ public final class Neo4jPersistenceExceptionTranslator implements PersistenceExc
 			BiFunction<String, Throwable, DataAccessException> defaultTranslationProvider) {
 
 		Optional<String> optionalErrorCode = Optional.ofNullable(e.code());
-		String msg = String.format("%s; Error code '%s'", e.getMessage(), optionalErrorCode.orElse("n/a"));
+		String msg = "%s; Error code '%s'".formatted(e.getMessage(), optionalErrorCode.orElse("n/a"));
 
 		return optionalErrorCode.flatMap(code -> ERROR_CODE_MAPPINGS.getOrDefault(code, Optional.empty()))
 				.orElse(defaultTranslationProvider).apply(msg, e);

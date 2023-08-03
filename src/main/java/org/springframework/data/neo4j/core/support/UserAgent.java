@@ -54,14 +54,14 @@ public enum UserAgent {
 		this.sdnVersion = sdnVersion;
 
 		String unknown = "-";
-		this.representation = String.format("Java/%s (%s %s %s) neo4j-java/%s spring-data/%s spring-data-neo4j/%s",
-				System.getProperty("java.version"),
-				System.getProperty("java.vm.vendor"),
-				System.getProperty("java.vm.name"),
-				System.getProperty("java.vm.version"),
-				this.driverVersion == null ? unknown : this.driverVersion,
-				this.springDataVersion == null ? unknown : this.springDataVersion,
-				this.sdnVersion == null ? unknown : this.sdnVersion
+		this.representation = "Java/%s (%s %s %s) neo4j-java/%s spring-data/%s spring-data-neo4j/%s".formatted(
+	System.getProperty("java.version"),
+	System.getProperty("java.vm.vendor"),
+	System.getProperty("java.vm.name"),
+	System.getProperty("java.vm.version"),
+	this.driverVersion == null ? unknown : this.driverVersion,
+	this.springDataVersion == null ? unknown : this.springDataVersion,
+	this.sdnVersion == null ? unknown : this.sdnVersion
 		);
 	}
 

@@ -136,8 +136,8 @@ final class DefaultNeo4jEntityConverter implements Neo4jEntityConverter {
 		rootNodeDescription.getChildNodeDescriptionsInHierarchy().forEach(nodeDescription -> primaryLabels.add(nodeDescription.getPrimaryLabel()));
 
 		// Massage the initial mapAccessor into something we can deal with
-		Iterable<Value> recordValues = mapAccessor instanceof Value && ((Value) mapAccessor).hasType(nodeType) ?
-				Collections.singletonList((Value) mapAccessor) : mapAccessor.values();
+		Iterable<Value> recordValues = mapAccessor instanceof Value v && v.hasType(nodeType) ?
+				Collections.singletonList(v) : mapAccessor.values();
 
 		List<Node> matchingNodes = new ArrayList<>(); // The node that eventually becomes the query root. The list should only contain one node.
 		List<Node> seenMatchingNodes = new ArrayList<>(); // A list of candidates: All things that are nodes and have a matching label
@@ -191,7 +191,7 @@ final class DefaultNeo4jEntityConverter implements Neo4jEntityConverter {
 		if (!isSynthesized) {
 			// Check if the original record has been a map. Would have been probably sane to do this right from the start,
 			// but this would change original SDN 6.0 behaviour to much
-			if (mapAccessor instanceof Value && ((Value) mapAccessor).hasType(mapType)) {
+			if (mapAccessor instanceof Value value && value.hasType(mapType)) {
 				return mapAccessor;
 			}
 
@@ -417,8 +417,7 @@ final class DefaultNeo4jEntityConverter implements Neo4jEntityConverter {
 		List<String> labels = new ArrayList<>();
 		if (!labelsValue.isNull()) {
 			labels = labelsValue.asList(Value::asString);
-		} else if (queryResult instanceof Node) {
-			Node nodeRepresentation = (Node) queryResult;
+		} else if (queryResult instanceof Node nodeRepresentation) {
 			nodeRepresentation.labels().forEach(labels::add);
 		} else if (containsOnePlainNode(queryResult)) {
 			for (Value value : queryResult.values()) {
@@ -953,10 +952,12 @@ final class DefaultNeo4jEntityConverter implements Neo4jEntityConverter {
 				read.lock();
 				if (isInCreation(internalId)) {
 					throw new MappingException(
-							String.format(
-									"The node with id %s has a logical cyclic mapping dependency; " +
-											"its creation caused the creation of another node that has a reference to this",
-									internalId.substring(1))
+				(
+			"""
+			The node with id %s has a logical cyclic mapping dependency; \
+			its creation caused the creation of another node that has a reference to this\
+			""").formatted(
+			internalId.substring(1))
 					);
 				}
 				return internalIdStore.get(internalId);

@@ -124,14 +124,14 @@ public final class Neo4jTransactionUtils {
 		String defaultDatabase = "the default database";
 		String defaultUser = "the default user";
 
-		String _currentDb = currentDb.getValue() == null ? defaultDatabase : String.format("'%s'", currentDb.getValue());
-		String _requestedDb = requestedDb.getValue() == null ? defaultDatabase : String.format("'%s'", requestedDb.getValue());
+		String _currentDb = currentDb.getValue() == null ? defaultDatabase : "'%s'".formatted(currentDb.getValue());
+		String _requestedDb = requestedDb.getValue() == null ? defaultDatabase : "'%s'".formatted(requestedDb.getValue());
 
-		String _currentUser = currentUser.getValue() == null ? defaultUser : String.format("'%s'", currentUser.getValue());
-		String _requestedUser = requestedUser.getValue() == null ? defaultUser : String.format("'%s'", requestedUser.getValue());
+		String _currentUser = currentUser.getValue() == null ? defaultUser : "'%s'".formatted(currentUser.getValue());
+		String _requestedUser = requestedUser.getValue() == null ? defaultUser : "'%s'".formatted(requestedUser.getValue());
 
-		return String.format("There is already an ongoing Spring transaction for %s of %s, but you requested %s of %s", _currentUser, _currentDb,
-				_requestedUser, _requestedDb);
+		return "There is already an ongoing Spring transaction for %s of %s, but you requested %s of %s".formatted(_currentUser, _currentDb,
+	_requestedUser, _requestedDb);
 
 	}
 

@@ -45,8 +45,11 @@ public class TemplateExampleTest {
 	void shouldSaveAndReadEntities(@Autowired Neo4jTemplate neo4jTemplate) {
 
 		MovieEntity movie = new MovieEntity("The Love Bug",
-				"A movie that follows the adventures of Herbie, Herbie's driver, "
-						+ "Jim Douglas (Dean Jones), and Jim's love interest, " + "Carole Bennett (Michele Lee)");
+				"""
+				A movie that follows the adventures of Herbie, Herbie's driver, \
+				Jim Douglas (Dean Jones), and Jim's love interest, \
+				Carole Bennett (Michele Lee)\
+				""");
 
 		Roles roles1 = new Roles(new PersonEntity(1931, "Dean Jones"), Collections.singletonList("Didi"));
 		Roles roles2 = new Roles(new PersonEntity(1942, "Michele Lee"), Collections.singletonList("Michi"));

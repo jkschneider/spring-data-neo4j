@@ -234,16 +234,17 @@ class RelationshipsIT extends RelationshipsITBase {
 
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig());
 				Transaction tx = session.beginTransaction()) {
-			tx.run(""
-				   + "CREATE (p1:AltPerson {name: 'val1'})\n"
-				   + "CREATE (p2:AltPerson {name: 'val2'})\n"
-				   + "CREATE (p3:AltPerson {name: 'val3'})\n"
-				   + "CREATE (m1:Multiple1O1Relationships {name: 'm1'})\n"
-				   + "CREATE (m2:Multiple1O1Relationships {name: 'm2'})\n"
-				   + "CREATE (m1) - [:REL_1] -> (p1)\n"
-				   + "CREATE (m1) - [:REL_2] -> (p2)\n"
-				   + "CREATE (m2) - [:REL_1] -> (p1)\n"
-				   + "CREATE (m2) - [:REL_2] -> (p3)");
+			tx.run("""
+				   CREATE (p1:AltPerson {name: 'val1'})
+				   CREATE (p2:AltPerson {name: 'val2'})
+				   CREATE (p3:AltPerson {name: 'val3'})
+				   CREATE (m1:Multiple1O1Relationships {name: 'm1'})
+				   CREATE (m2:Multiple1O1Relationships {name: 'm2'})
+				   CREATE (m1) - [:REL_1] -> (p1)
+				   CREATE (m1) - [:REL_2] -> (p2)
+				   CREATE (m2) - [:REL_1] -> (p1)
+				   CREATE (m2) - [:REL_2] -> (p3)\
+				   """);
 			tx.commit();
 			bookmarkCapture.seedWith(session.lastBookmarks());
 		}

@@ -75,11 +75,13 @@ class ListPropertyConversionIT {
 
 		try (Session session = driver.session(bookmarkCapture.createSessionConfig())) {
 			session.run("MATCH (n) DETACH DELETE n").consume();
-			existingNodeId = session.run("CREATE (n:DomainObjectWithListOfConvertables {"
-										 + "someprefixA_0: '1', someprefixB_0: '2', someprefixA_1: '3', someprefixB_1: '4', "
-										 + "`moreCollectedData.A_0`: '11', `moreCollectedData.B_0`: '22', `moreCollectedData.A_1`: '33', `moreCollectedData.B_1`: '44', "
-										 + "anotherSet: '1;2,3;4'"
-										 + "}) RETURN id(n)")
+			existingNodeId = session.run("""
+										 CREATE (n:DomainObjectWithListOfConvertables {\
+										 someprefixA_0: '1', someprefixB_0: '2', someprefixA_1: '3', someprefixB_1: '4', \
+										 `moreCollectedData.A_0`: '11', `moreCollectedData.B_0`: '22', `moreCollectedData.A_1`: '33', `moreCollectedData.B_1`: '44', \
+										 anotherSet: '1;2,3;4'\
+										 }) RETURN id(n)\
+										 """)
 					.single().get(0).asLong();
 			bookmarkCapture.seedWith(session.lastBookmarks());
 		}
@@ -305,7 +307,7 @@ class ListPropertyConversionIT {
 			}
 
 			return Values.value(source.stream().map(v ->
-							String.format("%s;%s", v.x.toString(), v.y.toString()))
+				"%s;%s".formatted(v.x.toString(), v.y.toString()))
 					.collect(Collectors.joining(",")));
 		}
 

@@ -63,9 +63,9 @@ final class NamedParameters {
 
 		if (this.parameters.containsKey(name)) {
 			Object previousValue = this.parameters.get(name);
-			throw new IllegalArgumentException(String.format(
-					"Duplicate parameter name: '%s' already in the list of named parameters with value '%s'. New value would be '%s'",
-					name, previousValue == null ? "null" : previousValue.toString(), value == null ? "null" : value.toString()));
+			throw new IllegalArgumentException(
+		"Duplicate parameter name: '%s' already in the list of named parameters with value '%s'. New value would be '%s'".formatted(
+	name, previousValue == null ? "null" : previousValue.toString(), value == null ? "null" : value.toString()));
 		}
 
 		if (Constants.NAME_OF_PROPERTIES_PARAM.equals(name) && value != null) {
@@ -113,8 +113,8 @@ final class NamedParameters {
 
 		Map<String, Object> newProperties = new HashMap<>(properties.size());
 		properties.forEach((k, v) -> {
-			if (v instanceof MapValueWrapper) {
-				Value mapValue = ((MapValueWrapper) v).getMapValue();
+			if (v instanceof MapValueWrapper wrapper) {
+				Value mapValue = wrapper.getMapValue();
 				mapValue.keys().forEach(k2 -> newProperties.put(k2, mapValue.get(k2)));
 			} else {
 				newProperties.put(k, v);
@@ -136,7 +136,7 @@ final class NamedParameters {
 
 	@Override
 	public String toString() {
-		return parameters.entrySet().stream().map(e -> String.format(":param %s => %s", e.getKey(), formatValue(e.getValue())))
+		return parameters.entrySet().stream().map(e -> ":param %s => %s".formatted(e.getKey(), formatValue(e.getValue())))
 				.collect(Collectors.joining(System.lineSeparator()));
 	}
 
@@ -144,14 +144,14 @@ final class NamedParameters {
 	private static String formatValue(@Nullable Object value) {
 		if (value == null) {
 			return null;
-		} else if (value instanceof String) {
-			return Cypher.quote((String) value);
-		} else if (value instanceof Map) {
-			return ((Map<?, ?>) value).entrySet().stream()
-					.map(e -> String.format("%s: %s", e.getKey(), formatValue(e.getValue()))).collect(
+		} else if (value instanceof String string) {
+			return Cypher.quote(string);
+		} else if (value instanceof Map map) {
+			return map.entrySet().stream()
+					.map(e -> "%s: %s".formatted(e.getKey(), formatValue(e.getValue()))).collect(
 							Collectors.joining(", ", "{", "}"));
-		} else if (value instanceof Collection) {
-			return ((Collection<?>) value).stream().map(NamedParameters::formatValue).collect(
+		} else if (value instanceof Collection collection) {
+			return collection.stream().map(NamedParameters::formatValue).collect(
 					Collectors.joining(", ", "[", "]"));
 		}
 

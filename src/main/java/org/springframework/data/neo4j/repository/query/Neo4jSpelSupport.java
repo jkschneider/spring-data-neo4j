@@ -111,19 +111,19 @@ public final class Neo4jSpelSupport {
 	}
 
 	private static String joinStrings(Object arg, String joinOn) {
-		if (arg instanceof Collection) {
-			return ((Collection<?>) arg).stream()
+		if (arg instanceof Collection collection) {
+			return collection.stream()
 					.map(o -> SchemaNames.sanitize(o.toString()).get())
 					.collect(Collectors.joining(joinOn));
 		}
 
 		// we are so kind and also accept plain strings instead of collection<string>
-		if (arg instanceof String) {
-			return (String) arg;
+		if (arg instanceof String string) {
+			return string;
 		}
 
 		throw new IllegalArgumentException(
-				String.format("Cannot process argument %s. Please note that only Collection<String> and String are supported types.", arg));
+	"Cannot process argument %s. Please note that only Collection<String> and String are supported types.".formatted(arg));
 	}
 	/**
 	 * A marker interface that indicates a literal replacement in a query instead of a parameter replacement. This

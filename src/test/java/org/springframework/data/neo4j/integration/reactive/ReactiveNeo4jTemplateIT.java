@@ -115,10 +115,12 @@ class ReactiveNeo4jTemplateIT {
 
 			transaction.run("CREATE (p:Person{firstName: 'A', lastName: 'LA'})");
 			simonsId = transaction
-					.run("CREATE (p:Person{firstName: 'Michael', lastName: 'Siemons'})" +
-							"-[:LIVES_AT]->(a:Address {city: 'Aachen', id: 1})" +
-							"-[:BASED_IN]->(c:YetAnotherCountryEntity{name: 'Gemany', countryCode: 'DE'})" +
-							"RETURN id(p)")
+					.run("""
+							CREATE (p:Person{firstName: 'Michael', lastName: 'Siemons'})\
+							-[:LIVES_AT]->(a:Address {city: 'Aachen', id: 1})\
+							-[:BASED_IN]->(c:YetAnotherCountryEntity{name: 'Gemany', countryCode: 'DE'})\
+							RETURN id(p)\
+							""")
 					.single().get(0).asLong();
 			nullNullSchneider = transaction
 					.run("CREATE (p:Person{firstName: 'Helge', lastName: 'Schnitzel'}) -[:LIVES_AT]-> (a:Address {city: 'Mülheim an der Ruhr'}) RETURN id(p)")
@@ -127,12 +129,14 @@ class ReactiveNeo4jTemplateIT {
 			transaction.run("CREATE (p:PersonWithAssignedId{id: 'x', firstName: 'John', lastName: 'Doe'})");
 
 			transaction.run(
-					"CREATE (root:NodeEntity:BaseNodeEntity{nodeId: 'root'}) " +
-							"CREATE (company:NodeEntity:BaseNodeEntity{nodeId: 'comp'}) " +
-							"CREATE (cred:Credential{id: 'uuid-1', name: 'Creds'}) " +
-							"CREATE (company)-[:CHILD_OF]->(root) " +
-							"CREATE (root)-[:HAS_CREDENTIAL]->(cred) " +
-							"CREATE (company)-[:WITH_CREDENTIAL]->(cred)");
+					"""
+					CREATE (root:NodeEntity:BaseNodeEntity{nodeId: 'root'}) \
+					CREATE (company:NodeEntity:BaseNodeEntity{nodeId: 'comp'}) \
+					CREATE (cred:Credential{id: 'uuid-1', name: 'Creds'}) \
+					CREATE (company)-[:CHILD_OF]->(root) \
+					CREATE (root)-[:HAS_CREDENTIAL]->(cred) \
+					CREATE (company)-[:WITH_CREDENTIAL]->(cred)\
+					""");
 
 			transaction.commit();
 

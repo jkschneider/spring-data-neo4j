@@ -69,9 +69,10 @@ final class StringBasedNeo4jQuery extends AbstractNeo4jQuery {
 
 	private final static String COMMENT_OR_WHITESPACE_GROUP = "(?:\\s|/\\\\*.*?\\\\*/|//.*?$)";
 	static final Pattern SKIP_AND_LIMIT_WITH_PLACEHOLDER_PATTERN = Pattern
-			.compile(""
-					 + "(?ims)"
-					 + ".+SKIP" + COMMENT_OR_WHITESPACE_GROUP + "+"
+			.compile("""
+					 (?ims)\
+					 .+SKIP\
+					 """ + COMMENT_OR_WHITESPACE_GROUP + "+"
 					 + "\\$" + COMMENT_OR_WHITESPACE_GROUP + "*(?:(?-i)skip)" + COMMENT_OR_WHITESPACE_GROUP + "+"
 					 + "LIMIT" + COMMENT_OR_WHITESPACE_GROUP + "+"
 					 + "\\$" + COMMENT_OR_WHITESPACE_GROUP + "*(?:(?-i)limit)"
@@ -115,10 +116,12 @@ final class StringBasedNeo4jQuery extends AbstractNeo4jQuery {
 				throw new MappingException("Expected paging query method to have a count query");
 			}
 			if (supportsCount) {
-				Neo4jQuerySupport.REPOSITORY_QUERY_LOG.debug(() -> String.format(
-						"You provided a string based query returning a slice for '%s.%s'. "
-						+ "You might want to consider adding a count query if more slices than you expect are returned.",
-						queryMethod.getRepositoryName(), queryMethod.getName()));
+				Neo4jQuerySupport.REPOSITORY_QUERY_LOG.debug(() -> (
+			"""
+			You provided a string based query returning a slice for '%s.%s'. \
+			You might want to consider adding a count query if more slices than you expect are returned.\
+			""").formatted(
+			queryMethod.getRepositoryName(), queryMethod.getName()));
 			}
 		}
 
@@ -127,11 +130,13 @@ final class StringBasedNeo4jQuery extends AbstractNeo4jQuery {
 
 		if (requiresSkipAndLimit && !hasSkipAndLimitKeywordsAndPlaceholders(cypherTemplate)) {
 			Neo4jQuerySupport.REPOSITORY_QUERY_LOG.warn(() ->
-					String.format("The custom query %n%s%n"
-								  + "for '%s.%s' is supposed to work with a page or slicing query but does not have the required "
-								  + "parameter placeholders `$skip` and `$limit`.%n"
-								  + "Be aware that those parameters are case sensitive and SDN uses the lower case variant.",
-							cypherTemplate, queryMethod.getRepositoryName(), queryMethod.getName()));
+		("""
+	The custom query %n%s%n\
+	for '%s.%s' is supposed to work with a page or slicing query but does not have the required \
+	parameter placeholders `$skip` and `$limit`.%n\
+	Be aware that those parameters are case sensitive and SDN uses the lower case variant.\
+	""").formatted(
+	cypherTemplate, queryMethod.getRepositoryName(), queryMethod.getName()));
 		}
 
 		return new StringBasedNeo4jQuery(neo4jOperations, mappingContext, evaluationContextProvider, queryMethod,

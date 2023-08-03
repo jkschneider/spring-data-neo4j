@@ -74,10 +74,10 @@ final class ReactivePersistenceExceptionTranslationInterceptor implements Method
 		// Add the translation. Nothing will happen if no-one subscribe the reactive result.
 		Function<RuntimeException, Throwable> errorMappingFunction = t -> t instanceof DataAccessException ? t
 				: DataAccessUtils.translateIfNecessary(t, translator);
-		if (m instanceof Mono) {
-			return ((Mono<?>) m).onErrorMap(RuntimeException.class, errorMappingFunction);
-		} else if (m instanceof Flux) {
-			return ((Flux<?>) m).onErrorMap(RuntimeException.class, errorMappingFunction);
+		if (m instanceof Mono mono) {
+			return mono.onErrorMap(RuntimeException.class, errorMappingFunction);
+		} else if (m instanceof Flux flux) {
+			return flux.onErrorMap(RuntimeException.class, errorMappingFunction);
 		} else {
 			return m;
 		}

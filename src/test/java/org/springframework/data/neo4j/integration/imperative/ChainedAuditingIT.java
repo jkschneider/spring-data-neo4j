@@ -80,7 +80,7 @@ public class ChainedAuditingIT {
 		assertThat(book.getModifiedBy()).isNotNull();
 
 		for (int i = 1; i <= 5; ++i) {
-			book.setContent(String.format("Content was edited %d times", i));
+			book.setContent("Content was edited %d times".formatted(i));
 			book = bookRepository.save(book);
 		}
 

@@ -668,9 +668,9 @@ public enum CypherGenerator {
 							if (tail.trim().matches("`.+`")) {
 								tail = tail.replaceFirst("`(.+)`", "$1");
 							} else {
-								throw new IllegalArgumentException(String.format(
-										"Cannot handle order property `%s`, it must be a simple property or one-hop path",
-										property));
+								throw new IllegalArgumentException(
+							"Cannot handle order property `%s`, it must be a simple property or one-hop path".formatted(
+						property));
 							}
 						}
 						expression = Cypher.property(property.substring(0, firstDot), tail);

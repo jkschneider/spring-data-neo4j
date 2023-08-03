@@ -139,10 +139,11 @@ class NonDomainResultsImpl implements NonDomainResults {
 	@Override
 	public Collection<Result> findRelationsToMovie(MovieEntity movie) {
 		return this.neo4jClient
-				.query(""
-					   + "MATCH (people:Person)-[relatedTo]-(:Movie {title: $title}) "
-					   + "RETURN people.name AS name, "
-					   + "       Type(relatedTo) as typeOfRelation"
+				.query("""
+					   MATCH (people:Person)-[relatedTo]-(:Movie {title: $title}) \
+					   RETURN people.name AS name, \
+					          Type(relatedTo) as typeOfRelation\
+					   """
 				) // <.>
 				.bind(movie.getTitle()).to("title") // <.>
 				.fetchAs(Result.class) // <.>

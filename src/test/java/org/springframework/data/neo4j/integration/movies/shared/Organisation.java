@@ -83,8 +83,10 @@ public class Organisation {
 	}
 
 	@Override public String toString() {
-		return "Organisation{" +
-			   "id=" + id +
+		return """
+			   Organisation{\
+			   id=\
+			   """ + id +
 			   ", partnerCode='" + partnerCode + '\'' +
 			   ", code='" + code + '\'' +
 			   ", name='" + name + '\'' +

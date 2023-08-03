@@ -70,8 +70,10 @@ public class AltLikedByPersonRelationship {
 
 	@Override
 	public String toString() {
-		return "AltLikedByPersonRelationship{" +
-				"rating=" + rating +
+		return """
+				AltLikedByPersonRelationship{\
+				rating=\
+				""" + rating +
 				", altPerson=" + altPerson.getName() +
 				'}';
 	}

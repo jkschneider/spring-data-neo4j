@@ -166,11 +166,11 @@ class TypeConversionIT extends Neo4jConversionsITBase {
 							() -> {
 								Object actual = ReflectionTestUtils.getField(thing, a.getKey());
 								Object expected = a.getValue();
-								if (actual instanceof URL && expected instanceof URL) {
+								if (actual instanceof URL rL && expected instanceof URL rL) {
 									// The host has been chosen to avoid interaction with the URLStreamHandler
 									// Should be enough for our comparision.
-									actual = ((URL) actual).getHost();
-									expected = ((URL) expected).getHost();
+									actual = rL.getHost();
+									expected = rL.getHost();
 								}
 								assertThat(actual).isEqualTo(expected);
 							})));

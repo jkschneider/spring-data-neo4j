@@ -93,16 +93,20 @@ class DefaultNeo4jPersistentEntityTest {
 		void failsOnDuplicatedProperties() {
 			assertThatIllegalStateException()
 					.isThrownBy(() -> new Neo4jMappingContext().getPersistentEntity(EntityWithDuplicatedProperties.class))
-					.withMessage("Duplicate definition of property [name] in entity class "
-							+ "org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithDuplicatedProperties");
+					.withMessage("""
+							Duplicate definition of property [name] in entity class \
+							org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithDuplicatedProperties\
+							""");
 		}
 
 		@Test
 		void failsOnMultipleDuplicatedProperties() {
 			assertThatIllegalStateException()
 					.isThrownBy(() -> new Neo4jMappingContext().getPersistentEntity(EntityWithMultipleDuplicatedProperties.class))
-					.withMessage("Duplicate definition of properties [foo, name] in entity class "
-							+ "org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithMultipleDuplicatedProperties");
+					.withMessage("""
+							Duplicate definition of properties [foo, name] in entity class \
+							org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithMultipleDuplicatedProperties\
+							""");
 		}
 
 		@Test // GH-1903
@@ -110,8 +114,10 @@ class DefaultNeo4jPersistentEntityTest {
 			assertThatIllegalStateException()
 					.isThrownBy(() -> new Neo4jMappingContext().getPersistentEntity(
 							EntityWithInheritedMultipleDuplicatedProperties.class))
-					.withMessage("Duplicate definition of property [name] in entity class "
-								 + "org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithInheritedMultipleDuplicatedProperties");
+					.withMessage("""
+								 Duplicate definition of property [name] in entity class \
+								 org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentEntityTest$EntityWithInheritedMultipleDuplicatedProperties\
+								 """);
 		}
 
 		@Test // GH-1903
